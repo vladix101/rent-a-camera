@@ -1,0 +1,20 @@
+.idea/
+
+# Backend build output
+backend/target/
+backend/build/
+backend/.gradle/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Logs and local environment files
+*.log
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
