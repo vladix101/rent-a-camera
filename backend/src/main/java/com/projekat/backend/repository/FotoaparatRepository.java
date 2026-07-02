@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FotoaparatRepository extends JpaRepository<Fotoaparat, Long> {
+    long countByDostupanTrue();
+    long countByDostupanFalse();
 }

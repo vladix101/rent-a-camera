@@ -50,6 +50,12 @@ const Header = ({loggedInUser, onLogout}) => {
                         </Link>
                     )}
 
+                    {loggedInUser?.userType === "ZAPOSLENI" && (
+                        <Link className="fr-login-btn" to="/statistika">
+                            Statistika
+                        </Link>
+                    )}
+
                     {loggedInUser && (
                         <div className="fr-user-summary">
                             <span className="fr-user-avatar" aria-hidden="true">

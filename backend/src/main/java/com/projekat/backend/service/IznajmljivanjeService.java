@@ -8,8 +8,10 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfWriter;
+import com.projekat.backend.dto.EmployeeDashboardStatsDto;
 import com.projekat.backend.dto.IznajmljivanjeDto;
 import com.projekat.backend.dto.IznajmljivanjeRequestDto;
+import com.projekat.backend.dto.RentalStatsDto;
 import com.projekat.backend.entity.Fotoaparat;
 import com.projekat.backend.entity.Iznajmljivanje;
 import com.projekat.backend.entity.Klijent;
@@ -35,9 +37,12 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +99,74 @@ public class IznajmljivanjeService {
                 .stream()
                 .map(iznajmljivanje -> toDto(iznajmljivanje, iznajmljivanje.getFotoaparat()))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EmployeeDashboardStatsDto getStatistika(LocalDate datumOd, LocalDate datumDo) {
+        List<Iznajmljivanje> sveIznajmljivanja = iznajmljivanjeRepository.findAll();
+
+        Map<Long, Long> brojPoFotoaparatId = new LinkedHashMap<>();
+        Map<Long, Fotoaparat> fotoaparatPoId = new LinkedHashMap<>();
+        for (Iznajmljivanje iznajmljivanje : sveIznajmljivanja) {
+            Fotoaparat fotoaparat = iznajmljivanje.getFotoaparat();
+            brojPoFotoaparatId.merge(fotoaparat.getId(), 1L, Long::sum);
+            fotoaparatPoId.putIfAbsent(fotoaparat.getId(), fotoaparat);
+        }
+
+        long ukupnoIznajmljivanja = sveIznajmljivanja.size();
+        List<RentalStatsDto> statistikaPoFotoaparatu = brojPoFotoaparatId.entrySet()
+                .stream()
+                .map(entry -> new RentalStatsDto(
+                        nazivZaFotoaparat(fotoaparatPoId.get(entry.getKey())),
+                        entry.getValue(),
+                        ukupnoIznajmljivanja == 0 ? 0.0 : Math.round(entry.getValue() * 10000.0 / ukupnoIznajmljivanja) / 100.0
+                ))
+                .sorted(Comparator.comparing(RentalStatsDto::getBrojIznajmljivanja).reversed())
+                .toList();
+
+        String najpopularniji = statistikaPoFotoaparatu.isEmpty() ? null : statistikaPoFotoaparatu.get(0).getNazivFotoaparata();
+
+        long brojDostupnih;
+        long brojNedostupnih;
+        if (datumOd != null && datumDo != null) {
+            Set<Long> zauzetiIds = iznajmljivanjeRepository
+                    .findByDatumPocetkaLessThanEqualAndDatumKrajaGreaterThanEqual(datumDo, datumOd)
+                    .stream()
+                    .map(iznajmljivanje -> iznajmljivanje.getFotoaparat().getId())
+                    .collect(Collectors.toSet());
+            long ukupnoDostupnihUPonudi = fotoaparatRepository.countByDostupanTrue();
+            brojDostupnih = fotoaparatRepository.findAll().stream()
+                    .filter(fotoaparat -> Boolean.TRUE.equals(fotoaparat.getDostupan()) && !zauzetiIds.contains(fotoaparat.getId()))
+                    .count();
+            brojNedostupnih = fotoaparatRepository.count() - brojDostupnih;
+            if (brojDostupnih > ukupnoDostupnihUPonudi) {
+                brojDostupnih = ukupnoDostupnihUPonudi;
+            }
+        } else {
+            brojDostupnih = fotoaparatRepository.countByDostupanTrue();
+            brojNedostupnih = fotoaparatRepository.countByDostupanFalse();
+        }
+
+        return new EmployeeDashboardStatsDto(
+                ukupnoIznajmljivanja,
+                klijentRepository.count(),
+                fotoaparatRepository.count(),
+                brojDostupnih,
+                brojNedostupnih,
+                najpopularniji,
+                statistikaPoFotoaparatu
+        );
+    }
+
+    private String nazivZaFotoaparat(Fotoaparat fotoaparat) {
+        if (fotoaparat == null) {
+            return "Nepoznat fotoaparat";
+        }
+        Specifikcija specifikcija = fotoaparat.getSpecifikcije().isEmpty() ? null : fotoaparat.getSpecifikcije().get(0);
+        String proizvodjacNaziv = fotoaparat.getProizvodjac() == null ? "Fotoaparat" : fotoaparat.getProizvodjac().getName();
+        return specifikcija != null && specifikcija.getRezolucija() != null
+                ? proizvodjacNaziv + " · " + specifikcija.getRezolucija()
+                : proizvodjacNaziv;
     }
 
     private void validatePayment(IznajmljivanjeRequestDto requestDto) {

@@ -533,6 +533,10 @@
     padding: 18px;
   }
 
+  .filter-field input {
+    width: 100%;
+  }
+
   .filter-summary {
     margin-left: 0;
     justify-content: center;
@@ -544,5 +548,39 @@
 
   .auth-card {
     padding: 28px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    width: 100%;
+    padding: 0 14px;
+    margin: 20px auto 44px;
+  }
+
+  .auth-shell {
+    width: 100%;
+    padding: 0 14px;
+    margin: 40px auto 60px;
+  }
+
+  .auth-card {
+    padding: 22px 16px;
+  }
+
+  .camera-card-body {
+    padding: 16px;
+  }
+
+  .camera-spec-list {
+    grid-template-columns: 1fr;
+  }
+
+  .verification-actions {
+    justify-content: stretch;
+  }
+
+  .verification-actions button {
+    flex: 1;
   }
 }

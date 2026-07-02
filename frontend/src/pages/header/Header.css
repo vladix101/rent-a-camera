@@ -140,15 +140,19 @@
 
     .fr-nav-links {
         width: 100%;
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .fr-login-btn {
         width: 100%;
+        box-sizing: border-box;
+        min-height: 44px;
     }
 
     .fr-user-summary {
         width: 100%;
+        box-sizing: border-box;
         justify-content: space-between;
     }
 }

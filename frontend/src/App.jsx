@@ -6,6 +6,7 @@ import Register from './pages/register/Register.jsx'
 import MyRentals from './pages/myRentals/MyRentals.jsx'
 import AddCameraPage from './pages/camera/AddCameraPage.jsx'
 import ClientsPage from './pages/clients/ClientsPage.jsx'
+import StatisticsPage from './pages/statistics/StatisticsPage.jsx'
 import {useEffect, useState} from 'react'
 import {Routes, Route, Navigate} from 'react-router-dom'
 
@@ -55,6 +56,10 @@ function App() {
           <Route
               path="/klijenti"
               element={loggedInUser?.userType === "ZAPOSLENI" ? <ClientsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
+          <Route
+              path="/statistika"
+              element={loggedInUser?.userType === "ZAPOSLENI" ? <StatisticsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
         </Routes>
       </>

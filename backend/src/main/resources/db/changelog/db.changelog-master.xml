@@ -7,4 +7,5 @@
 
     <include file="db/changelog/changes/001-seed-initial-data.xml"/>
     <include file="db/changelog/changes/002-shorten-mirrorless-category.xml"/>
+    <include file="db/changelog/changes/003-seed-more-iznajmljivanja.xml"/>
 </databaseChangeLog>
