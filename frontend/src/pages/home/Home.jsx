@@ -1,8 +1,10 @@
-import {useEffect, useState} from "react"
+import {useEffect, useMemo, useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
 import {getCameraImage} from "../../utils/cameraImages.js"
 import CameraModal from "./CameraModal.jsx"
+import EditCameraModal from "../camera/EditCameraModal.jsx"
 import "./Home.css"
+import "../camera/CameraForm.css"
 
 const todayIso = () => new Date().toISOString().slice(0, 10)
 const tomorrowIso = () => {
@@ -20,7 +22,10 @@ const Home = ({loggedInUser}) => {
     const [selectedFotoaparat, setSelectedFotoaparat] = useState(null)
     const [bookingMessage, setBookingMessage] = useState("")
     const [refreshToken, setRefreshToken] = useState(0)
+    const [searchTerm, setSearchTerm] = useState("")
+    const [editingFotoaparat, setEditingFotoaparat] = useState(null)
 
+    const isZaposleni = loggedInUser?.userType === "ZAPOSLENI"
     const rangeInvalid = datumOd && datumDo && datumDo <= datumOd
 
     useEffect(() => {
@@ -80,6 +85,50 @@ const Home = ({loggedInUser}) => {
         window.setTimeout(() => setBookingMessage(""), 6000)
     }
 
+    const filteredFotoaparati = useMemo(() => {
+        const term = searchTerm.trim().toLowerCase()
+        if (!term) {
+            return fotoaparati
+        }
+        return fotoaparati.filter((fotoaparat) => {
+            const haystack = [
+                fotoaparat.proizvodjacNaziv,
+                fotoaparat.kategorijaNaziv,
+                fotoaparat.rezolucija,
+                fotoaparat.opis
+            ].filter(Boolean).join(" ").toLowerCase()
+            return haystack.includes(term)
+        })
+    }, [fotoaparati, searchTerm])
+
+    const handleEditSaved = () => {
+        setEditingFotoaparat(null)
+        setRefreshToken((token) => token + 1)
+    }
+
+    const handleDelete = async (event, fotoaparat) => {
+        event.stopPropagation()
+        const displayName = `${fotoaparat.proizvodjacNaziv ?? ""} ${fotoaparat.rezolucija ?? ""}`.trim()
+        if (!window.confirm(`Da li ste sigurni da želite da obrišete fotoaparat "${displayName}"?`)) {
+            return
+        }
+
+        try {
+            const response = await fetch(apiUrl(`/api/fotoaparati/${fotoaparat.id}`), {
+                method: "DELETE",
+                headers: {"Authorization": `Bearer ${loggedInUser.token}`}
+            })
+            if (!response.ok) {
+                setError("Brisanje fotoaparata nije uspelo")
+                return
+            }
+            setRefreshToken((token) => token + 1)
+        } catch (error) {
+            console.error("Error deleting fotoaparat:", error.message)
+            setError("Brisanje fotoaparata nije uspelo")
+        }
+    }
+
     return (
         <main className="main-content">
             <h1 className="page-title">Ponuda fotoaparata</h1>
@@ -117,15 +166,27 @@ const Home = ({loggedInUser}) => {
                 )}
             </section>
 
+            <section className="search-bar" aria-label="Pretraga fotoaparata">
+                <input
+                    type="search"
+                    className="search-input"
+                    placeholder="Pretraži po nazivu, proizvođaču ili kategoriji..."
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                />
+            </section>
+
             {bookingMessage && <p className="verification-success">{bookingMessage}</p>}
             {error && <p className="error-banner">{error}</p>}
 
-            {!error && !loading && fotoaparati.length === 0 && (
-                <p className="empty-state">Trenutno nema fotoaparata u ponudi.</p>
+            {!error && !loading && filteredFotoaparati.length === 0 && (
+                <p className="empty-state">
+                    {fotoaparati.length === 0 ? "Trenutno nema fotoaparata u ponudi." : "Nema fotoaparata koji odgovaraju pretrazi."}
+                </p>
             )}
 
             <section className="camera-grid" aria-label="Lista fotoaparata">
-                {fotoaparati.map((fotoaparat) => (
+                {filteredFotoaparati.map((fotoaparat) => (
                     <article
                         className="camera-card"
                         key={fotoaparat.id}
@@ -180,6 +241,28 @@ const Home = ({loggedInUser}) => {
                                 ) : <span/>}
                                 {fotoaparat.napomena && <span className="note-text">{fotoaparat.napomena}</span>}
                             </div>
+
+                            {isZaposleni && (
+                                <div className="camera-card-manage">
+                                    <button
+                                        type="button"
+                                        className="camera-card-edit-btn"
+                                        onClick={(event) => {
+                                            event.stopPropagation()
+                                            setEditingFotoaparat(fotoaparat)
+                                        }}
+                                    >
+                                        Izmeni
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="camera-card-delete-btn"
+                                        onClick={(event) => handleDelete(event, fotoaparat)}
+                                    >
+                                        Obriši
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </article>
                 ))}
@@ -191,6 +274,15 @@ const Home = ({loggedInUser}) => {
                     loggedInUser={loggedInUser}
                     onClose={() => setSelectedFotoaparat(null)}
                     onBookingComplete={handleBookingComplete}
+                />
+            )}
+
+            {editingFotoaparat && (
+                <EditCameraModal
+                    fotoaparat={editingFotoaparat}
+                    loggedInUser={loggedInUser}
+                    onClose={() => setEditingFotoaparat(null)}
+                    onSaved={handleEditSaved}
                 />
             )}
         </main>

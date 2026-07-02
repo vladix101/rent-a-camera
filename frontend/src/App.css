@@ -316,6 +316,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
   margin-bottom: 16px;
 }
 
@@ -328,6 +329,7 @@
 }
 
 .auth-field input {
+  width: 100%;
   min-height: 46px;
   padding: 10px 14px;
   border: 1px solid rgba(30, 27, 75, 0.14);

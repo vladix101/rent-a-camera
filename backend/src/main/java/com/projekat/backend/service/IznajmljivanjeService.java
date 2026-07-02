@@ -1,5 +1,13 @@
 package com.projekat.backend.service;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfWriter;
 import com.projekat.backend.dto.IznajmljivanjeDto;
 import com.projekat.backend.dto.IznajmljivanjeRequestDto;
 import com.projekat.backend.entity.Fotoaparat;
@@ -10,13 +18,23 @@ import com.projekat.backend.exception.ValidationException;
 import com.projekat.backend.repository.FotoaparatRepository;
 import com.projekat.backend.repository.IznajmljivanjeRepository;
 import com.projekat.backend.repository.KlijentRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +46,15 @@ public class IznajmljivanjeService {
     private final IznajmljivanjeRepository iznajmljivanjeRepository;
     private final FotoaparatRepository fotoaparatRepository;
     private final KlijentRepository klijentRepository;
-    private final EmailService emailService;
-    private final PdfService pdfService;
+    private final JavaMailSender javaMailSender;
+
+    @Value("${spring.mail.username:}")
+    private String mailSenderAddress;
+
+    @Value("${app.name}")
+    private String appName;
+
+    private static final DateTimeFormatter PDF_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
     @Transactional
     public IznajmljivanjeDto createIznajmljivanje(Long klijentId, IznajmljivanjeRequestDto requestDto) {
@@ -108,17 +133,74 @@ public class IznajmljivanjeService {
         }
 
         try {
-            byte[] pdf = pdfService.generateRentalConfirmationPdf(klijent, fotoaparat, iznajmljivanje);
-            String htmlBody = """
+            byte[] pdf = generateRentalConfirmationPdf(klijent, fotoaparat, iznajmljivanje);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(mailSenderAddress);
+            helper.setTo(klijent.getEmail());
+            helper.setSubject("Potvrda iznajmljivanja");
+            helper.setText("""
                     <div style="font-family: Arial, sans-serif; color: #1e1b4b; line-height: 1.6; padding: 20px;">
                         <h2 style="margin: 0 0 12px;">Iznajmljivanje je uspešno potvrđeno</h2>
                         <p style="margin: 0;">PDF potvrda vašeg iznajmljivanja je u prilogu ovog email-a.</p>
                     </div>
-                    """;
-            emailService.sendRentalConfirmationEmail(klijent.getEmail(), "Potvrda iznajmljivanja", htmlBody, pdf, "potvrda-iznajmljivanja.pdf");
-        } catch (ResponseStatusException | MailException exception) {
+                    """, true);
+            helper.addAttachment("potvrda-iznajmljivanja.pdf", () -> new ByteArrayInputStream(pdf), "application/pdf");
+            javaMailSender.send(message);
+        } catch (MessagingException | MailException | DocumentException exception) {
             // Iznajmljivanje je već uspešno kreirano; neuspeh slanja email potvrde ne sme da poništi rezervaciju.
         }
+    }
+
+    private byte[] generateRentalConfirmationPdf(Klijent klijent, Fotoaparat fotoaparat, Iznajmljivanje iznajmljivanje) throws DocumentException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 48, 48, 54, 48);
+        PdfWriter.getInstance(document, outputStream);
+        document.open();
+
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font textFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+
+        Specifikcija specifikcija = fotoaparat.getSpecifikcije().isEmpty() ? null : fotoaparat.getSpecifikcije().get(0);
+        String proizvodjacNaziv = fotoaparat.getProizvodjac() == null ? "Fotoaparat" : fotoaparat.getProizvodjac().getName();
+        String modelNaziv = proizvodjacNaziv + (specifikcija != null && specifikcija.getRezolucija() != null ? " · " + specifikcija.getRezolucija() : "");
+
+        Paragraph title = new Paragraph(appName, titleFont);
+        title.setSpacingAfter(4);
+        document.add(title);
+
+        Paragraph subtitle = new Paragraph("Potvrda iznajmljivanja fotoaparata", sectionFont);
+        subtitle.setSpacingAfter(18);
+        document.add(subtitle);
+
+        document.add(detailLine("Klijent", klijent.getIme() + " " + klijent.getPrezime(), textFont));
+        document.add(detailLine("Email", klijent.getEmail(), textFont));
+        document.add(detailLine("Fotoaparat", modelNaziv, textFont));
+        document.add(detailLine("Period iznajmljivanja", formatPdfDate(iznajmljivanje.getDatumPocetka()) + " - " + formatPdfDate(iznajmljivanje.getDatumKraja()), textFont));
+        if (iznajmljivanje.getCena() != null) {
+            document.add(detailLine("Cena", iznajmljivanje.getCena() + " EUR", textFont));
+        }
+        document.add(detailLine("Datum kreiranja potvrde", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm")), textFont));
+
+        Paragraph footer = new Paragraph("Vaše iznajmljivanje je uspešno potvrđeno. Hvala što ste izabrali " + appName + "!", textFont);
+        footer.setSpacingBefore(20);
+        document.add(footer);
+
+        document.close();
+        return outputStream.toByteArray();
+    }
+
+    private Paragraph detailLine(String label, String value, Font textFont) {
+        Paragraph paragraph = new Paragraph();
+        paragraph.setSpacingBefore(7);
+        paragraph.add(new Phrase(label + ": ", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11)));
+        paragraph.add(new Phrase(value == null || value.isBlank() ? "-" : value, textFont));
+        return paragraph;
+    }
+
+    private String formatPdfDate(LocalDate date) {
+        return date == null ? "-" : date.format(PDF_DATE_FORMATTER);
     }
 
     private void throwValidationError(String field, String message) {

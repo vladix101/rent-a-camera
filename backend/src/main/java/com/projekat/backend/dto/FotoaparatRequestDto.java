@@ -2,14 +2,12 @@ package com.projekat.backend.dto;
 
 import java.time.LocalDate;
 
-public class FotoaparatDto {
-    private Long id;
+public class FotoaparatRequestDto {
+    private String proizvodjacNaziv;
+    private Long kategorijaId;
     private LocalDate datumKupovine;
     private String napomena;
     private Boolean dostupan;
-    private String proizvodjacNaziv;
-    private Long kategorijaId;
-    private String kategorijaNaziv;
     private String rezolucija;
     private String senzorSlike;
     private Boolean wifi;
@@ -17,38 +15,21 @@ public class FotoaparatDto {
     private String napajanje;
     private String velicinaSlike;
     private String opis;
-    private Boolean dostupanZaPeriod;
 
-    public FotoaparatDto() {
+    public String getProizvodjacNaziv() {
+        return proizvodjacNaziv;
     }
 
-    public FotoaparatDto(Long id, LocalDate datumKupovine, String napomena, Boolean dostupan,
-                          String proizvodjacNaziv, Long kategorijaId, String kategorijaNaziv, String rezolucija, String senzorSlike,
-                          Boolean wifi, String ekran, String napajanje, String velicinaSlike, String opis,
-                          Boolean dostupanZaPeriod) {
-        this.id = id;
-        this.datumKupovine = datumKupovine;
-        this.napomena = napomena;
-        this.dostupan = dostupan;
+    public void setProizvodjacNaziv(String proizvodjacNaziv) {
         this.proizvodjacNaziv = proizvodjacNaziv;
+    }
+
+    public Long getKategorijaId() {
+        return kategorijaId;
+    }
+
+    public void setKategorijaId(Long kategorijaId) {
         this.kategorijaId = kategorijaId;
-        this.kategorijaNaziv = kategorijaNaziv;
-        this.rezolucija = rezolucija;
-        this.senzorSlike = senzorSlike;
-        this.wifi = wifi;
-        this.ekran = ekran;
-        this.napajanje = napajanje;
-        this.velicinaSlike = velicinaSlike;
-        this.opis = opis;
-        this.dostupanZaPeriod = dostupanZaPeriod;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public LocalDate getDatumKupovine() {
@@ -73,30 +54,6 @@ public class FotoaparatDto {
 
     public void setDostupan(Boolean dostupan) {
         this.dostupan = dostupan;
-    }
-
-    public String getProizvodjacNaziv() {
-        return proizvodjacNaziv;
-    }
-
-    public void setProizvodjacNaziv(String proizvodjacNaziv) {
-        this.proizvodjacNaziv = proizvodjacNaziv;
-    }
-
-    public Long getKategorijaId() {
-        return kategorijaId;
-    }
-
-    public void setKategorijaId(Long kategorijaId) {
-        this.kategorijaId = kategorijaId;
-    }
-
-    public String getKategorijaNaziv() {
-        return kategorijaNaziv;
-    }
-
-    public void setKategorijaNaziv(String kategorijaNaziv) {
-        this.kategorijaNaziv = kategorijaNaziv;
     }
 
     public String getRezolucija() {
@@ -153,13 +110,5 @@ public class FotoaparatDto {
 
     public void setOpis(String opis) {
         this.opis = opis;
-    }
-
-    public Boolean getDostupanZaPeriod() {
-        return dostupanZaPeriod;
-    }
-
-    public void setDostupanZaPeriod(Boolean dostupanZaPeriod) {
-        this.dostupanZaPeriod = dostupanZaPeriod;
     }
 }

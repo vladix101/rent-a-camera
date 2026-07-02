@@ -322,15 +322,49 @@
     background: linear-gradient(135deg, var(--purple), var(--pink));
 }
 
+/* ---------- Search bar ---------- */
+
+.search-bar {
+    margin-bottom: 22px;
+}
+
+.search-input {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    background: var(--surface);
+    backdrop-filter: blur(14px);
+    color: var(--ink);
+    font-size: 14.5px;
+    font-weight: 650;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: rgba(124, 58, 237, 0.55);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.14);
+}
+
 /* ---------- Payment modal ---------- */
 
 .payment-modal {
     width: min(94vw, 440px);
+    max-width: 100%;
     padding: 30px 28px;
     border: 1px solid rgba(255, 255, 255, 0.7);
     border-radius: var(--radius);
     background: var(--surface-solid);
     box-shadow: var(--shadow-lg);
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.payment-modal form {
+    width: 100%;
 }
 
 .payment-modal h2 {
@@ -357,8 +391,9 @@
 
 .payment-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 12px;
+    width: 100%;
 }
 
 .payment-success {

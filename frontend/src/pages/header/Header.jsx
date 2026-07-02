@@ -38,6 +38,18 @@ const Header = ({loggedInUser, onLogout}) => {
                         </Link>
                     )}
 
+                    {loggedInUser?.userType === "ZAPOSLENI" && (
+                        <Link className="fr-login-btn" to="/dodaj-aparat">
+                            Dodaj aparat
+                        </Link>
+                    )}
+
+                    {loggedInUser?.userType === "ZAPOSLENI" && (
+                        <Link className="fr-login-btn" to="/klijenti">
+                            Prikaz svih klijenata
+                        </Link>
+                    )}
+
                     {loggedInUser && (
                         <div className="fr-user-summary">
                             <span className="fr-user-avatar" aria-hidden="true">

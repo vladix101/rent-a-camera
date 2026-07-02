@@ -2,16 +2,22 @@ package com.projekat.backend.service;
 
 import com.projekat.backend.dto.KlijentDto;
 import com.projekat.backend.dto.KlijentRegistrationDto;
+import com.projekat.backend.dto.KlijentUpdateDto;
 import com.projekat.backend.dto.KlijentVerificationDto;
 import com.projekat.backend.dto.LoginRequestDto;
 import com.projekat.backend.dto.LoginResponseDto;
 import com.projekat.backend.dto.MessageResponseDto;
 import com.projekat.backend.entity.Klijent;
 import com.projekat.backend.exception.ValidationException;
+import com.projekat.backend.repository.IznajmljivanjeRepository;
 import com.projekat.backend.repository.KlijentRepository;
 import com.projekat.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,8 +35,15 @@ import java.util.regex.Pattern;
 public class KlijentService {
 
     private final KlijentRepository klijentRepository;
-    private final EmailService emailService;
+    private final IznajmljivanjeRepository iznajmljivanjeRepository;
+    private final JavaMailSender javaMailSender;
     private final JwtUtil jwtUtil;
+
+    @Value("${spring.mail.username:}")
+    private String mailSenderAddress;
+
+    @Value("${app.name}")
+    private String appName;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
@@ -100,6 +113,56 @@ public class KlijentService {
         return toDto(klijent);
     }
 
+    @Transactional
+    public KlijentDto updateKlijent(Long id, KlijentUpdateDto updateDto) {
+        Klijent klijent = klijentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Klijent nije pronađen"));
+
+        validateUpdate(klijent, updateDto);
+
+        klijent.setIme(updateDto.getIme());
+        klijent.setPrezime(updateDto.getPrezime());
+        klijent.setStarost(updateDto.getStarost());
+        klijent.setUsername(updateDto.getUsername());
+        klijent.setEmail(updateDto.getEmail());
+        klijent = klijentRepository.save(klijent);
+
+        return toDto(klijent);
+    }
+
+    @Transactional
+    public void deleteKlijent(Long id) {
+        Klijent klijent = klijentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Klijent nije pronađen"));
+
+        if (!iznajmljivanjeRepository.findByKlijentId(id).isEmpty()) {
+            throwValidationError("form", "Klijent ima postojeća iznajmljivanja i ne može biti obrisan");
+        }
+
+        klijentRepository.delete(klijent);
+    }
+
+    private void validateUpdate(Klijent existing, KlijentUpdateDto updateDto) {
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+
+        if (updateDto.getUsername() == null || updateDto.getUsername().isBlank()) {
+            fieldErrors.put("username", "Korisničko ime je obavezno");
+        } else if (!updateDto.getUsername().equals(existing.getUsername())
+                && klijentRepository.existsByUsername(updateDto.getUsername())) {
+            fieldErrors.put("username", "Korisničko ime već postoji");
+        }
+
+        if (updateDto.getEmail() == null || updateDto.getEmail().isBlank()) {
+            fieldErrors.put("email", "Email je obavezan");
+        } else if (!EMAIL_PATTERN.matcher(updateDto.getEmail()).matches()) {
+            fieldErrors.put("email", "Email nije validan");
+        }
+
+        if (!fieldErrors.isEmpty()) {
+            throw new ValidationException(fieldErrors);
+        }
+    }
+
     private void validateRegistration(String username, String password, String email) {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
 
@@ -129,8 +192,22 @@ public class KlijentService {
         String code = String.format("%06d", SECURE_RANDOM.nextInt(1_000_000));
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
 
-        emailService.sendVerificationEmail(email, code);
+        sendVerificationEmail(email, code);
         verificationCodes.put(normalizedEmail, new VerificationCodeData(code, expiresAt));
+    }
+
+    private void sendVerificationEmail(String email, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailSenderAddress);
+        message.setTo(email);
+        message.setSubject(appName + " - verifikacioni kod");
+        message.setText("Vaš verifikacioni kod je: " + code + "\n\nKod ističe za 10 minuta.");
+
+        try {
+            javaMailSender.send(message);
+        } catch (MailException exception) {
+            throwValidationError("email", "Verifikacioni email nije mogao biti poslat. Proverite mail konfiguraciju.");
+        }
     }
 
     private void validateVerificationCode(String email, String code) {

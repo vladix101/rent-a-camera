@@ -4,6 +4,8 @@ import Home from './pages/home/Home.jsx'
 import Login from './pages/login/Login.jsx'
 import Register from './pages/register/Register.jsx'
 import MyRentals from './pages/myRentals/MyRentals.jsx'
+import AddCameraPage from './pages/camera/AddCameraPage.jsx'
+import ClientsPage from './pages/clients/ClientsPage.jsx'
 import {useEffect, useState} from 'react'
 import {Routes, Route, Navigate} from 'react-router-dom'
 
@@ -45,6 +47,14 @@ function App() {
           <Route
               path="/moja-iznajmljivanja"
               element={loggedInUser?.userType === "KLIJENT" ? <MyRentals loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
+          <Route
+              path="/dodaj-aparat"
+              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddCameraPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
+          <Route
+              path="/klijenti"
+              element={loggedInUser?.userType === "ZAPOSLENI" ? <ClientsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
         </Routes>
       </>
