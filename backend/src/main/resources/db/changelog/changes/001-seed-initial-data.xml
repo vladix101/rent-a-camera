@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="001-seed-initial-data" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="kategorija"/>
+            <tableExists tableName="proizvodjac"/>
+            <tableExists tableName="fotoaparat"/>
+            <tableExists tableName="specifikcija"/>
+            <tableExists tableName="klijent"/>
+            <tableExists tableName="zaposleni"/>
+            <tableExists tableName="iznajmljivanje"/>
+        </preConditions>
+        <sql splitStatements="true" stripComments="true">
+            INSERT IGNORE INTO kategorija (id, naziv) VALUES
+                (1, 'DSLR'),
+                (2, 'Bezogledalni (Mirrorless)'),
+                (3, 'Kompaktni'),
+                (4, 'Akciona kamera'),
+                (5, 'Instant'),
+                (6, 'Video kamera');
+
+            INSERT IGNORE INTO proizvodjac (id, name) VALUES
+                (1, 'Canon'),
+                (2, 'Nikon'),
+                (3, 'Sony'),
+                (4, 'Fujifilm'),
+                (5, 'Panasonic'),
+                (6, 'Olympus'),
+                (7, 'Leica'),
+                (8, 'GoPro'),
+                (9, 'Pentax'),
+                (10, 'Sigma');
+
+            INSERT IGNORE INTO fotoaparat (id, datum_kupovine, napomena, dostupan, proizvodjac_id) VALUES
+                (1, '2022-05-10', 'Redovno servisiran', true, 1),
+                (2, '2021-11-03', 'Odlicno stanje', true, 2),
+                (3, '2023-01-15', 'Kompaktan i lagan', true, 3),
+                (4, '2020-08-22', 'Ima sitne ogrebotine na kucistu', true, 4),
+                (5, '2023-06-30', 'Novo, malo koriscen', true, 5),
+                (6, '2019-03-12', 'Stariji model, trenutno van upotrebe', false, 6),
+                (7, '2022-09-01', 'Profesionalni model', true, 7),
+                (8, '2023-02-18', 'Vodootporna akciona kamera', true, 8),
+                (9, '2021-07-07', 'Klasican dizajn', true, 9),
+                (10, '2020-12-25', 'Zahteva ciscenje senzora, trenutno van upotrebe', false, 10);
+
+            INSERT IGNORE INTO specifikcija (id, rezolucija, senzor_slike, wifi, ekran, napajanje, velicina_slike, opis, kategorija_id, fotoaparat_id) VALUES
+                (1, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'DSLR fotoaparat idealan za pocetnike i entuzijaste.', 1, 1),
+                (2, '45MP', 'Full Frame CMOS', true, '3.2" nagibni LCD', 'Li-ion baterija', '8256x5504', 'Profesionalni DSLR sa odlicnim performansama pri slaboj svetlosti.', 1, 2),
+                (3, '20MP', '1-incni senzor', true, '3.0" touchscreen', 'Li-ion baterija', '5472x3648', 'Kompaktan bezogledalni fotoaparat za svakodnevnu upotrebu.', 3, 3),
+                (4, '26MP', 'X-Trans CMOS', true, '3.0" nagibni touchscreen', 'Li-ion baterija', '6240x4160', 'Retro dizajn sa modernim performansama.', 2, 4),
+                (5, '20MP', 'Four Thirds CMOS', true, '3.0" vari-angle LCD', 'Li-ion baterija', '5184x3888', 'Odlican izbor za video snimanje.', 6, 5),
+                (6, '16MP', 'Four Thirds Live MOS', false, '3.0" LCD', 'Li-ion baterija', '4608x3456', 'Kompaktan mirrorless fotoaparat.', 2, 6),
+                (7, '24MP', 'Full Frame CMOS', false, '3.0" LCD', 'Li-ion baterija', '5952x3968', 'Legendarni kvalitet izrade i optike.', 1, 7),
+                (8, '12MP', 'CMOS akciona kamera', true, '2.0" touchscreen', 'Li-ion baterija', '4000x3000', 'Vodootporna kamera za ekstremne sportove.', 4, 8),
+                (9, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'Robustan DSLR otporan na vremenske uslove.', 1, 9),
+                (10, '14MP', 'Foveon X3 CMOS', false, 'Bez ekrana (trazilo)', 'Li-ion baterija', '4704x3136', 'Jedinstven senzor za izuzetnu ostrinu boja.', 3, 10);
+
+            INSERT IGNORE INTO klijent (id, ime, prezime, starost, username, password, email) VALUES
+                (1, 'Marko', 'Markovic', 25, 'marko', 'marko123', 'marko@example.com'),
+                (2, 'Jovana', 'Jovanovic', 30, 'jovana', 'jovana123', 'jovana@example.com'),
+                (3, 'Petar', 'Petrovic', 22, 'petar', 'petar123', 'petar@example.com'),
+                (4, 'Ana', 'Anic', 28, 'ana', 'ana123', 'ana@example.com'),
+                (5, 'Nikola', 'Nikolic', 35, 'nikola', 'nikola123', 'nikola@example.com'),
+                (6, 'Milica', 'Milic', 27, 'milica', 'milica123', 'milica@example.com'),
+                (7, 'Stefan', 'Stefanovic', 31, 'stefan', 'stefan123', 'stefan@example.com'),
+                (8, 'Ivana', 'Ivic', 24, 'ivana', 'ivana123', 'ivana@example.com'),
+                (9, 'Luka', 'Lukic', 29, 'luka', 'luka123', 'luka@example.com'),
+                (10, 'Test', 'Klijent', 26, 'klijent', 'klijent123', 'klijent@example.com');
+
+            INSERT IGNORE INTO zaposleni (id, ime, prezime, username, password, email) VALUES
+                (1, 'Jelena', 'Jelic', 'jelenaz', 'jelena123', 'jelenaz@fotorent.com'),
+                (2, 'Nemanja', 'Simic', 'nemanja', 'nemanja123', 'nemanja@fotorent.com'),
+                (3, 'Tamara', 'Tasic', 'tamara', 'tamara123', 'tamara@fotorent.com'),
+                (4, 'Vladimir', 'Vukovic', 'vladimir', 'vladimir123', 'vladimir@fotorent.com'),
+                (5, 'Sara', 'Savic', 'sara', 'sara123', 'sara@fotorent.com'),
+                (6, 'Milos', 'Milosevic', 'milos', 'milos123', 'milos@fotorent.com'),
+                (7, 'Katarina', 'Kostic', 'katarina', 'katarina123', 'katarina@fotorent.com'),
+                (8, 'Nikola', 'Nesic', 'nikolaz', 'nikola123z', 'nikolaz@fotorent.com'),
+                (9, 'Ognjen', 'Ognjanovic', 'ognjen', 'ognjen123', 'ognjen@fotorent.com'),
+                (10, 'Test', 'Zaposleni', 'zaposleni', 'zaposleni123', 'zaposleni@fotorent.com');
+
+            INSERT IGNORE INTO iznajmljivanje (id, datum_pocetka, datum_kraja, cena, napomena, fotoaparat_id, klijent_id, zaposleni_id) VALUES
+                (1, '2026-07-01', '2026-07-04', 45.00, 'Vikend iznajmljivanje', 1, 1, 1),
+                (2, '2026-06-20', '2026-06-25', 60.00, 'Iznajmljivanje za vencanje', 2, 2, 2),
+                (3, '2026-07-02', '2026-07-05', 30.00, 'Poslovno putovanje', 3, 3, 1),
+                (4, '2026-07-10', '2026-07-12', 40.00, 'Rodjendanska proslava', 4, 4, 3),
+                (5, '2026-05-01', '2026-05-03', 25.00, 'Kratak izlet', 5, 5, 4),
+                (6, '2026-07-15', '2026-07-20', 80.00, 'Snimanje reklame', 7, 6, 5),
+                (7, '2026-06-01', '2026-06-05', 35.00, 'Porodicno putovanje', 8, 7, 6),
+                (8, '2026-07-03', '2026-07-06', 50.00, 'Iznajmljivanje za konferenciju', 9, 8, 7),
+                (9, '2026-08-01', '2026-08-05', 55.00, 'Letnji festival', 1, 9, 8),
+                (10, '2026-07-02', '2026-07-03', 20.00, 'Jednodnevno fotografisanje', 5, 10, 9);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
