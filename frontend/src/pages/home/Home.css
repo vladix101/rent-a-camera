@@ -1,0 +1,437 @@
+/* ---------- Modal shell ---------- */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(30, 27, 75, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.modal-backdrop.payment-backdrop {
+    z-index: 60;
+}
+
+/* ---------- Camera detail modal ---------- */
+
+.camera-modal {
+    width: min(96vw, 920px);
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius);
+    background: var(--surface-solid);
+    box-shadow: var(--shadow-lg);
+}
+
+.camera-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 900;
+    box-shadow: var(--shadow-sm);
+}
+
+.camera-modal-close:hover {
+    background: #ffffff;
+    transform: scale(1.06);
+}
+
+.camera-modal-art {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+
+.camera-modal-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-modal-art .camera-card-category,
+.camera-modal-art .camera-card-badge {
+    max-width: none;
+}
+
+.camera-modal-body {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 28px;
+    padding: 26px 28px 30px;
+}
+
+.camera-modal-info h2 {
+    margin: 0 0 4px;
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.camera-modal-info .manufacturer {
+    margin: 0 0 12px;
+    color: var(--pink);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.camera-modal-info p.description {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+.camera-modal-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(124, 58, 237, 0.06);
+}
+
+.camera-modal-specs div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.camera-modal-specs span {
+    color: var(--purple-dark);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.camera-modal-specs strong {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.camera-modal-booking h3 {
+    margin: 0 0 10px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.calendar-hint {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+.calendar-hint.guest {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(6, 182, 212, 0.08);
+}
+
+.book-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.28);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.book-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: saturate(1.1);
+}
+
+.book-button:disabled {
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    box-shadow: none;
+}
+
+/* ---------- Occupancy calendar ---------- */
+
+.occupancy-calendar {
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+}
+
+.occupancy-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.occupancy-calendar-header button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(124, 58, 237, 0.10);
+    color: var(--purple-dark);
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.occupancy-calendar-header button:hover {
+    background: rgba(124, 58, 237, 0.2);
+}
+
+.occupancy-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.occupancy-calendar-weekdays span {
+    text-align: center;
+    color: var(--muted);
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.occupancy-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.cal-day:disabled:not(.cal-readonly) {
+    visibility: hidden;
+}
+
+.cal-day-free {
+    background: rgba(16, 185, 129, 0.10);
+    color: #047857;
+}
+
+.cal-day-free:not(.cal-readonly):hover {
+    background: rgba(16, 185, 129, 0.24);
+    cursor: pointer;
+}
+
+.cal-day-occupied {
+    background: rgba(239, 68, 68, 0.14);
+    color: #b91c1c;
+    cursor: not-allowed;
+}
+
+.cal-day-past {
+    background: transparent;
+    color: var(--muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.cal-day-today {
+    box-shadow: inset 0 0 0 2px rgba(124, 58, 237, 0.5);
+}
+
+.cal-day-selected-start,
+.cal-day-selected-end {
+    background: linear-gradient(135deg, var(--purple), var(--pink)) !important;
+    color: #ffffff !important;
+}
+
+.cal-day-in-range {
+    background: rgba(124, 58, 237, 0.20) !important;
+    color: var(--purple-dark) !important;
+}
+
+.occupancy-calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.occupancy-calendar-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-free {
+    background: #10b981;
+}
+
+.legend-occupied {
+    background: #ef4444;
+}
+
+.legend-selected {
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+}
+
+/* ---------- Payment modal ---------- */
+
+.payment-modal {
+    width: min(94vw, 440px);
+    padding: 30px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius);
+    background: var(--surface-solid);
+    box-shadow: var(--shadow-lg);
+}
+
+.payment-modal h2 {
+    margin: 0 0 4px;
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.payment-summary {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(124, 58, 237, 0.06);
+    color: var(--text);
+    font-size: 13.5px;
+    font-weight: 650;
+    line-height: 1.6;
+}
+
+.payment-summary strong {
+    color: var(--purple-dark);
+}
+
+.payment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.payment-success {
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #dcfce7, #f0fdf4);
+    color: #15803d;
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* ---------- Moja iznajmljivanja ---------- */
+
+.rental-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.rental-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius);
+    background: var(--surface-solid);
+    box-shadow: var(--shadow-sm);
+}
+
+.rental-card-art {
+    height: 130px;
+}
+
+.rental-card-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rental-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 20px 20px;
+}
+
+.rental-card-body h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.rental-period {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(236, 72, 153, 0.12));
+    color: var(--purple-dark);
+    font-size: 12.5px;
+    font-weight: 800;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+    .camera-modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-row {
+        grid-template-columns: 1fr;
+    }
+}

@@ -6,16 +6,18 @@ public class LoginResponseDto {
     private String prezime;
     private String username;
     private String userType;
+    private String token;
 
     public LoginResponseDto() {
     }
 
-    public LoginResponseDto(Long userId, String ime, String prezime, String username, String userType) {
+    public LoginResponseDto(Long userId, String ime, String prezime, String username, String userType, String token) {
         this.userId = userId;
         this.ime = ime;
         this.prezime = prezime;
         this.username = username;
         this.userType = userType;
+        this.token = token;
     }
 
     public Long getUserId() {
@@ -56,5 +58,13 @@ public class LoginResponseDto {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

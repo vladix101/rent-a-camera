@@ -1,0 +1,26 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <radialGradient id="lensGrad" cx="0.35" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#d1fae5"/>
+      <stop offset="0.55" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#064e3b"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bgGrad)"/>
+  <g opacity="0.12">
+    <circle cx="70" cy="240" r="85" fill="#ffffff"/>
+    <circle cx="340" cy="50" r="60" fill="#ffffff"/>
+  </g>
+  <rect x="100" y="120" width="200" height="130" rx="16" fill="#f8fafc"/>
+  <circle cx="170" cy="175" r="42" fill="#1e1b4b"/>
+  <circle cx="170" cy="175" r="34" fill="url(#lensGrad)"/>
+  <circle cx="170" cy="175" r="14" fill="#1e1b4b"/>
+  <circle cx="160" cy="165" r="5" fill="#ffffff" opacity="0.8"/>
+  <rect x="240" y="145" width="42" height="30" rx="4" fill="#1e1b4b"/>
+  <rect x="248" y="152" width="26" height="16" rx="2" fill="#a7f3d0"/>
+  <circle cx="120" cy="142" r="6" fill="#f59e0b"/>
+</svg>

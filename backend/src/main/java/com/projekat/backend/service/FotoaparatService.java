@@ -1,14 +1,17 @@
 package com.projekat.backend.service;
 
 import com.projekat.backend.dto.FotoaparatDto;
+import com.projekat.backend.dto.ZauzetostDto;
 import com.projekat.backend.entity.Fotoaparat;
 import com.projekat.backend.entity.Iznajmljivanje;
 import com.projekat.backend.entity.Specifikcija;
 import com.projekat.backend.repository.FotoaparatRepository;
 import com.projekat.backend.repository.IznajmljivanjeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,6 +40,18 @@ public class FotoaparatService {
         return fotoaparatRepository.findAll()
                 .stream()
                 .map(fotoaparat -> toDto(fotoaparat, zauzetiFotoaparatIds))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ZauzetostDto> getZauzetPeriodi(Long fotoaparatId) {
+        if (!fotoaparatRepository.existsById(fotoaparatId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Fotoaparat nije pronađen");
+        }
+
+        return iznajmljivanjeRepository.findByFotoaparatId(fotoaparatId)
+                .stream()
+                .map(iznajmljivanje -> new ZauzetostDto(iznajmljivanje.getDatumPocetka(), iznajmljivanje.getDatumKraja()))
                 .toList();
     }
 

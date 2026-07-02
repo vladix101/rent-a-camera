@@ -2,14 +2,16 @@ import './App.css'
 import Header from './pages/header/Header.jsx'
 import Home from './pages/home/Home.jsx'
 import Login from './pages/login/Login.jsx'
+import Register from './pages/register/Register.jsx'
+import MyRentals from './pages/myRentals/MyRentals.jsx'
 import {useEffect, useState} from 'react'
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, Navigate} from 'react-router-dom'
 
 function App() {
   const getStoredUser = () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("loggedInUser") || "null")
-      return storedUser?.userId && storedUser?.userType ? storedUser : null
+      return storedUser?.userId && storedUser?.userType && storedUser?.token ? storedUser : null
     } catch {
       return null
     }
@@ -37,8 +39,13 @@ function App() {
       <>
         <Header loggedInUser={loggedInUser} onLogout={handleLogout}/>
         <Routes>
-          <Route path="/" element={<Home/>}/>
+          <Route path="/" element={<Home loggedInUser={loggedInUser}/>}/>
           <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
+          <Route path="/register" element={<Register/>}/>
+          <Route
+              path="/moja-iznajmljivanja"
+              element={loggedInUser?.userType === "KLIJENT" ? <MyRentals loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
         </Routes>
       </>
   )

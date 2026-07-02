@@ -1,23 +1,8 @@
 import {useEffect, useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
-
-const CATEGORY_GRADIENTS = {
-    "DSLR": "linear-gradient(135deg, #7c3aed, #4f46e5)",
-    "Bezogledalni (Mirrorless)": "linear-gradient(135deg, #ec4899, #db2777)",
-    "Kompaktni": "linear-gradient(135deg, #06b6d4, #0284c7)",
-    "Akciona kamera": "linear-gradient(135deg, #f59e0b, #ea580c)",
-    "Instant": "linear-gradient(135deg, #10b981, #059669)",
-    "Video kamera": "linear-gradient(135deg, #ef4444, #db2777)",
-}
-
-const DEFAULT_GRADIENT = "linear-gradient(135deg, #8b5cf6, #6366f1)"
-
-const CameraIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 8.5C3 7.11929 4.11929 6 5.5 6H7.5L8.7 4H15.3L16.5 6H18.5C19.8807 6 21 7.11929 21 8.5V17.5C21 18.8807 19.8807 20 18.5 20H5.5C4.11929 20 3 18.8807 3 17.5V8.5Z" stroke="white" strokeWidth="1.6" strokeLinejoin="round"/>
-        <circle cx="12" cy="13" r="3.6" stroke="white" strokeWidth="1.6"/>
-    </svg>
-)
+import {getCameraImage} from "../../utils/cameraImages.js"
+import CameraModal from "./CameraModal.jsx"
+import "./Home.css"
 
 const todayIso = () => new Date().toISOString().slice(0, 10)
 const tomorrowIso = () => {
@@ -26,12 +11,15 @@ const tomorrowIso = () => {
     return date.toISOString().slice(0, 10)
 }
 
-const Home = () => {
+const Home = ({loggedInUser}) => {
     const [datumOd, setDatumOd] = useState(todayIso)
     const [datumDo, setDatumDo] = useState(tomorrowIso)
     const [fotoaparati, setFotoaparati] = useState([])
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(true)
+    const [selectedFotoaparat, setSelectedFotoaparat] = useState(null)
+    const [bookingMessage, setBookingMessage] = useState("")
+    const [refreshToken, setRefreshToken] = useState(0)
 
     const rangeInvalid = datumOd && datumDo && datumDo <= datumOd
 
@@ -40,26 +28,32 @@ const Home = () => {
             return
         }
 
+        let cancelled = false
+
         const fetchFotoaparati = async () => {
             setLoading(true)
             setError("")
             try {
                 const response = await fetch(apiUrl(`/api/fotoaparati?datumOd=${datumOd}&datumDo=${datumDo}`))
                 if (!response.ok) {
-                    setError("Fotoaparati ne mogu biti učitani")
+                    if (!cancelled) setError("Fotoaparati ne mogu biti učitani")
                     return
                 }
-                setFotoaparati(await response.json())
+                const data = await response.json()
+                if (!cancelled) setFotoaparati(data)
             } catch (error) {
                 console.error("Error fetching fotoaparati:", error.message)
-                setError("Fotoaparati ne mogu biti učitani")
+                if (!cancelled) setError("Fotoaparati ne mogu biti učitani")
             } finally {
-                setLoading(false)
+                if (!cancelled) setLoading(false)
             }
         }
 
         void fetchFotoaparati()
-    }, [datumOd, datumDo, rangeInvalid])
+        return () => {
+            cancelled = true
+        }
+    }, [datumOd, datumDo, rangeInvalid, refreshToken])
 
     const handleDatumOdChange = (event) => {
         const value = event.target.value
@@ -78,6 +72,13 @@ const Home = () => {
         const diff = (new Date(datumDo) - new Date(datumOd)) / (1000 * 60 * 60 * 24)
         return Math.round(diff)
     })()
+
+    const handleBookingComplete = () => {
+        setSelectedFotoaparat(null)
+        setBookingMessage("Iznajmljivanje je uspešno potvrđeno! Proverite email za PDF potvrdu.")
+        setRefreshToken((token) => token + 1)
+        window.setTimeout(() => setBookingMessage(""), 6000)
+    }
 
     return (
         <main className="main-content">
@@ -116,6 +117,7 @@ const Home = () => {
                 )}
             </section>
 
+            {bookingMessage && <p className="verification-success">{bookingMessage}</p>}
             {error && <p className="error-banner">{error}</p>}
 
             {!error && !loading && fotoaparati.length === 0 && (
@@ -124,18 +126,19 @@ const Home = () => {
 
             <section className="camera-grid" aria-label="Lista fotoaparata">
                 {fotoaparati.map((fotoaparat) => (
-                    <article className="camera-card" key={fotoaparat.id}>
-                        <div
-                            className="camera-card-art"
-                            style={{background: CATEGORY_GRADIENTS[fotoaparat.kategorijaNaziv] || DEFAULT_GRADIENT}}
-                        >
+                    <article
+                        className="camera-card"
+                        key={fotoaparat.id}
+                        onClick={() => setSelectedFotoaparat(fotoaparat)}
+                    >
+                        <div className="camera-card-art">
+                            <img src={getCameraImage(fotoaparat.kategorijaNaziv)} alt={fotoaparat.kategorijaNaziv || "Fotoaparat"}/>
                             {fotoaparat.kategorijaNaziv && (
                                 <span className="camera-card-category">{fotoaparat.kategorijaNaziv}</span>
                             )}
                             <span className={`camera-card-badge ${fotoaparat.dostupanZaPeriod ? "available" : "unavailable"}`}>
                                 {fotoaparat.dostupanZaPeriod ? "Dostupan" : "Nije dostupan"}
                             </span>
-                            <CameraIcon/>
                         </div>
 
                         <div className="camera-card-body">
@@ -181,6 +184,15 @@ const Home = () => {
                     </article>
                 ))}
             </section>
+
+            {selectedFotoaparat && (
+                <CameraModal
+                    fotoaparat={selectedFotoaparat}
+                    loggedInUser={loggedInUser}
+                    onClose={() => setSelectedFotoaparat(null)}
+                    onBookingComplete={handleBookingComplete}
+                />
+            )}
         </main>
     )
 }
