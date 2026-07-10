@@ -7,6 +7,8 @@ import MyRentals from './pages/myRentals/MyRentals.jsx'
 import AddCameraPage from './pages/camera/AddCameraPage.jsx'
 import ClientsPage from './pages/clients/ClientsPage.jsx'
 import StatisticsPage from './pages/statistics/StatisticsPage.jsx'
+import AddCategoryPage from './pages/catalog/AddCategoryPage.jsx'
+import AddSpecificationPage from './pages/catalog/AddSpecificationPage.jsx'
 import {useEffect, useState} from 'react'
 import {Routes, Route, Navigate} from 'react-router-dom'
 
@@ -52,6 +54,14 @@ function App() {
           <Route
               path="/dodaj-aparat"
               element={loggedInUser?.userType === "ZAPOSLENI" ? <AddCameraPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
+          <Route
+              path="/dodaj-kategoriju"
+              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddCategoryPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+          />
+          <Route
+              path="/dodaj-specifikaciju"
+              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddSpecificationPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
               path="/klijenti"

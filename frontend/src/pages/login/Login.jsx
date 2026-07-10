@@ -100,10 +100,7 @@ const Login = ({onLogin}) => {
                     Nemate nalog? <a href="/register" onClick={(event) => { event.preventDefault(); navigate("/register") }}>Registruj se</a>
                 </p>
 
-                <div className="auth-hint-box">
-                    <strong>Test klijent:</strong> klijent / klijent123<br/>
-                    <strong>Test zaposleni:</strong> zaposleni / zaposleni123
-                </div>
+                
             </div>
         </main>
     )

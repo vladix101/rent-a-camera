@@ -15,7 +15,7 @@ import com.projekat.backend.dto.RentalStatsDto;
 import com.projekat.backend.entity.Fotoaparat;
 import com.projekat.backend.entity.Iznajmljivanje;
 import com.projekat.backend.entity.Klijent;
-import com.projekat.backend.entity.Specifikcija;
+import com.projekat.backend.entity.Specifikacija;
 import com.projekat.backend.exception.ValidationException;
 import com.projekat.backend.repository.FotoaparatRepository;
 import com.projekat.backend.repository.IznajmljivanjeRepository;
@@ -162,10 +162,10 @@ public class IznajmljivanjeService {
         if (fotoaparat == null) {
             return "Nepoznat fotoaparat";
         }
-        Specifikcija specifikcija = fotoaparat.getSpecifikcije().isEmpty() ? null : fotoaparat.getSpecifikcije().get(0);
+        Specifikacija specifikacija = fotoaparat.getSpecifikacija();
         String proizvodjacNaziv = fotoaparat.getProizvodjac() == null ? "Fotoaparat" : fotoaparat.getProizvodjac().getName();
-        return specifikcija != null && specifikcija.getRezolucija() != null
-                ? proizvodjacNaziv + " · " + specifikcija.getRezolucija()
+        return specifikacija != null && specifikacija.getRezolucija() != null
+                ? proizvodjacNaziv + " · " + specifikacija.getRezolucija()
                 : proizvodjacNaziv;
     }
 
@@ -235,9 +235,9 @@ public class IznajmljivanjeService {
         Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
         Font textFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
 
-        Specifikcija specifikcija = fotoaparat.getSpecifikcije().isEmpty() ? null : fotoaparat.getSpecifikcije().get(0);
+        Specifikacija specifikacija = fotoaparat.getSpecifikacija();
         String proizvodjacNaziv = fotoaparat.getProizvodjac() == null ? "Fotoaparat" : fotoaparat.getProizvodjac().getName();
-        String modelNaziv = proizvodjacNaziv + (specifikcija != null && specifikcija.getRezolucija() != null ? " · " + specifikcija.getRezolucija() : "");
+        String modelNaziv = proizvodjacNaziv + (specifikacija != null && specifikacija.getRezolucija() != null ? " · " + specifikacija.getRezolucija() : "");
 
         Paragraph title = new Paragraph(appName, titleFont);
         title.setSpacingAfter(4);
@@ -283,7 +283,7 @@ public class IznajmljivanjeService {
     }
 
     private IznajmljivanjeDto toDto(Iznajmljivanje iznajmljivanje, Fotoaparat fotoaparat) {
-        Specifikcija specifikcija = fotoaparat.getSpecifikcije().isEmpty() ? null : fotoaparat.getSpecifikcije().get(0);
+        Specifikacija specifikacija = fotoaparat.getSpecifikacija();
 
         return new IznajmljivanjeDto(
                 iznajmljivanje.getId(),
@@ -292,9 +292,9 @@ public class IznajmljivanjeService {
                 iznajmljivanje.getCena(),
                 fotoaparat.getId(),
                 fotoaparat.getProizvodjac() == null ? null : fotoaparat.getProizvodjac().getName(),
-                specifikcija == null || specifikcija.getKategorija() == null ? null : specifikcija.getKategorija().getNaziv(),
-                specifikcija == null ? null : specifikcija.getRezolucija(),
-                specifikcija == null ? null : specifikcija.getOpis()
+                fotoaparat.getKategorija() == null ? null : fotoaparat.getKategorija().getNaziv(),
+                specifikacija == null ? null : specifikacija.getRezolucija(),
+                specifikacija == null ? null : specifikacija.getOpis()
         );
     }
 }

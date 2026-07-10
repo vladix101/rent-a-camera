@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Specifikacija je sada zaseban entitet (nije vise asocijativna klasa izmedju
+         Kategorija i Fotoaparat). Stara tabela "specifikcija" (sa kategorija_id i
+         fotoaparat_id kolonama) se uklanja, a fotoaparat sada ima svoj specifikacija_id. -->
+    <changeSet id="004-drop-old-specifikcija-table" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="specifikcija"/>
+        </preConditions>
+        <dropTable tableName="specifikcija" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet id="004-seed-specifikacija-and-link-fotoaparat" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="specifikacija"/>
+            <tableExists tableName="fotoaparat"/>
+            <columnExists tableName="fotoaparat" columnName="kategorija_id"/>
+            <columnExists tableName="fotoaparat" columnName="specifikacija_id"/>
+        </preConditions>
+        <sql splitStatements="true" stripComments="true">
+            INSERT IGNORE INTO specifikacija (id, rezolucija, senzor_slike, wifi, ekran, napajanje, velicina_slike, opis) VALUES
+                (1, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'DSLR fotoaparat idealan za pocetnike i entuzijaste.'),
+                (2, '45MP', 'Full Frame CMOS', true, '3.2" nagibni LCD', 'Li-ion baterija', '8256x5504', 'Profesionalni DSLR sa odlicnim performansama pri slaboj svetlosti.'),
+                (3, '20MP', '1-incni senzor', true, '3.0" touchscreen', 'Li-ion baterija', '5472x3648', 'Kompaktan bezogledalni fotoaparat za svakodnevnu upotrebu.'),
+                (4, '26MP', 'X-Trans CMOS', true, '3.0" nagibni touchscreen', 'Li-ion baterija', '6240x4160', 'Retro dizajn sa modernim performansama.'),
+                (5, '20MP', 'Four Thirds CMOS', true, '3.0" vari-angle LCD', 'Li-ion baterija', '5184x3888', 'Odlican izbor za video snimanje.'),
+                (6, '16MP', 'Four Thirds Live MOS', false, '3.0" LCD', 'Li-ion baterija', '4608x3456', 'Kompaktan mirrorless fotoaparat.'),
+                (7, '24MP', 'Full Frame CMOS', false, '3.0" LCD', 'Li-ion baterija', '5952x3968', 'Legendarni kvalitet izrade i optike.'),
+                (8, '12MP', 'CMOS akciona kamera', true, '2.0" touchscreen', 'Li-ion baterija', '4000x3000', 'Vodootporna kamera za ekstremne sportove.'),
+                (9, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'Robustan DSLR otporan na vremenske uslove.'),
+                (10, '14MP', 'Foveon X3 CMOS', false, 'Bez ekrana (trazilo)', 'Li-ion baterija', '4704x3136', 'Jedinstven senzor za izuzetnu ostrinu boja.');
+
+            UPDATE fotoaparat SET kategorija_id = 1, specifikacija_id = 1 WHERE id = 1;
+            UPDATE fotoaparat SET kategorija_id = 1, specifikacija_id = 2 WHERE id = 2;
+            UPDATE fotoaparat SET kategorija_id = 3, specifikacija_id = 3 WHERE id = 3;
+            UPDATE fotoaparat SET kategorija_id = 2, specifikacija_id = 4 WHERE id = 4;
+            UPDATE fotoaparat SET kategorija_id = 6, specifikacija_id = 5 WHERE id = 5;
+            UPDATE fotoaparat SET kategorija_id = 2, specifikacija_id = 6 WHERE id = 6;
+            UPDATE fotoaparat SET kategorija_id = 1, specifikacija_id = 7 WHERE id = 7;
+            UPDATE fotoaparat SET kategorija_id = 4, specifikacija_id = 8 WHERE id = 8;
+            UPDATE fotoaparat SET kategorija_id = 1, specifikacija_id = 9 WHERE id = 9;
+            UPDATE fotoaparat SET kategorija_id = 3, specifikacija_id = 10 WHERE id = 10;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

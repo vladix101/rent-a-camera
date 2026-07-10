@@ -5,13 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
-public class Specifikcija {
+public class Specifikacija {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,14 +26,9 @@ public class Specifikcija {
     @Column(length = 1000)
     private String opis;
 
-    @ManyToOne
-    @JoinColumn(name = "kategorija_id")
-    private Kategorija kategorija;
+    @OneToMany(mappedBy = "specifikacija")
+    private List<Fotoaparat> fotoaparati = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "fotoaparat_id")
-    private Fotoaparat fotoaparat;
-
-    public Specifikcija() {
+    public Specifikacija() {
     }
 }

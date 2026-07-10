@@ -10,7 +10,6 @@
             <tableExists tableName="kategorija"/>
             <tableExists tableName="proizvodjac"/>
             <tableExists tableName="fotoaparat"/>
-            <tableExists tableName="specifikcija"/>
             <tableExists tableName="klijent"/>
             <tableExists tableName="zaposleni"/>
             <tableExists tableName="iznajmljivanje"/>
@@ -47,18 +46,6 @@
                 (8, '2023-02-18', 'Vodootporna akciona kamera', true, 8),
                 (9, '2021-07-07', 'Klasican dizajn', true, 9),
                 (10, '2020-12-25', 'Zahteva ciscenje senzora, trenutno van upotrebe', false, 10);
-
-            INSERT IGNORE INTO specifikcija (id, rezolucija, senzor_slike, wifi, ekran, napajanje, velicina_slike, opis, kategorija_id, fotoaparat_id) VALUES
-                (1, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'DSLR fotoaparat idealan za pocetnike i entuzijaste.', 1, 1),
-                (2, '45MP', 'Full Frame CMOS', true, '3.2" nagibni LCD', 'Li-ion baterija', '8256x5504', 'Profesionalni DSLR sa odlicnim performansama pri slaboj svetlosti.', 1, 2),
-                (3, '20MP', '1-incni senzor', true, '3.0" touchscreen', 'Li-ion baterija', '5472x3648', 'Kompaktan bezogledalni fotoaparat za svakodnevnu upotrebu.', 3, 3),
-                (4, '26MP', 'X-Trans CMOS', true, '3.0" nagibni touchscreen', 'Li-ion baterija', '6240x4160', 'Retro dizajn sa modernim performansama.', 2, 4),
-                (5, '20MP', 'Four Thirds CMOS', true, '3.0" vari-angle LCD', 'Li-ion baterija', '5184x3888', 'Odlican izbor za video snimanje.', 6, 5),
-                (6, '16MP', 'Four Thirds Live MOS', false, '3.0" LCD', 'Li-ion baterija', '4608x3456', 'Kompaktan mirrorless fotoaparat.', 2, 6),
-                (7, '24MP', 'Full Frame CMOS', false, '3.0" LCD', 'Li-ion baterija', '5952x3968', 'Legendarni kvalitet izrade i optike.', 1, 7),
-                (8, '12MP', 'CMOS akciona kamera', true, '2.0" touchscreen', 'Li-ion baterija', '4000x3000', 'Vodootporna kamera za ekstremne sportove.', 4, 8),
-                (9, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion baterija', '6000x4000', 'Robustan DSLR otporan na vremenske uslove.', 1, 9),
-                (10, '14MP', 'Foveon X3 CMOS', false, 'Bez ekrana (trazilo)', 'Li-ion baterija', '4704x3136', 'Jedinstven senzor za izuzetnu ostrinu boja.', 3, 10);
 
             INSERT IGNORE INTO klijent (id, ime, prezime, starost, username, password, email) VALUES
                 (1, 'Marko', 'Markovic', 25, 'marko', 'marko123', 'marko@example.com'),

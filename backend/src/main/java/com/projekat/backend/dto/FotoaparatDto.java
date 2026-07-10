@@ -7,9 +7,11 @@ public class FotoaparatDto {
     private LocalDate datumKupovine;
     private String napomena;
     private Boolean dostupan;
+    private Long proizvodjacId;
     private String proizvodjacNaziv;
     private Long kategorijaId;
     private String kategorijaNaziv;
+    private Long specifikacijaId;
     private String rezolucija;
     private String senzorSlike;
     private Boolean wifi;
@@ -23,16 +25,19 @@ public class FotoaparatDto {
     }
 
     public FotoaparatDto(Long id, LocalDate datumKupovine, String napomena, Boolean dostupan,
-                          String proizvodjacNaziv, Long kategorijaId, String kategorijaNaziv, String rezolucija, String senzorSlike,
+                          Long proizvodjacId, String proizvodjacNaziv, Long kategorijaId, String kategorijaNaziv,
+                          Long specifikacijaId, String rezolucija, String senzorSlike,
                           Boolean wifi, String ekran, String napajanje, String velicinaSlike, String opis,
                           Boolean dostupanZaPeriod) {
         this.id = id;
         this.datumKupovine = datumKupovine;
         this.napomena = napomena;
         this.dostupan = dostupan;
+        this.proizvodjacId = proizvodjacId;
         this.proizvodjacNaziv = proizvodjacNaziv;
         this.kategorijaId = kategorijaId;
         this.kategorijaNaziv = kategorijaNaziv;
+        this.specifikacijaId = specifikacijaId;
         this.rezolucija = rezolucija;
         this.senzorSlike = senzorSlike;
         this.wifi = wifi;
@@ -75,6 +80,14 @@ public class FotoaparatDto {
         this.dostupan = dostupan;
     }
 
+    public Long getProizvodjacId() {
+        return proizvodjacId;
+    }
+
+    public void setProizvodjacId(Long proizvodjacId) {
+        this.proizvodjacId = proizvodjacId;
+    }
+
     public String getProizvodjacNaziv() {
         return proizvodjacNaziv;
     }
@@ -97,6 +110,14 @@ public class FotoaparatDto {
 
     public void setKategorijaNaziv(String kategorijaNaziv) {
         this.kategorijaNaziv = kategorijaNaziv;
+    }
+
+    public Long getSpecifikacijaId() {
+        return specifikacijaId;
+    }
+
+    public void setSpecifikacijaId(Long specifikacijaId) {
+        this.specifikacijaId = specifikacijaId;
     }
 
     public String getRezolucija() {

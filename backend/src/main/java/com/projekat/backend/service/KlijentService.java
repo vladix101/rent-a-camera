@@ -12,12 +12,13 @@ import com.projekat.backend.exception.ValidationException;
 import com.projekat.backend.repository.IznajmljivanjeRepository;
 import com.projekat.backend.repository.KlijentRepository;
 import com.projekat.backend.security.JwtUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,19 +32,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
 public class KlijentService {
 
     private final KlijentRepository klijentRepository;
     private final IznajmljivanjeRepository iznajmljivanjeRepository;
     private final JavaMailSender javaMailSender;
     private final JwtUtil jwtUtil;
+    private final KlijentService self;
 
     @Value("${spring.mail.username:}")
     private String mailSenderAddress;
 
     @Value("${app.name}")
     private String appName;
+
+    public KlijentService(KlijentRepository klijentRepository, IznajmljivanjeRepository iznajmljivanjeRepository,
+                           JavaMailSender javaMailSender, JwtUtil jwtUtil, @Lazy KlijentService self) {
+        this.klijentRepository = klijentRepository;
+        this.iznajmljivanjeRepository = iznajmljivanjeRepository;
+        this.javaMailSender = javaMailSender;
+        this.jwtUtil = jwtUtil;
+        this.self = self;
+    }
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
@@ -192,11 +202,12 @@ public class KlijentService {
         String code = String.format("%06d", SECURE_RANDOM.nextInt(1_000_000));
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
 
-        sendVerificationEmail(email, code);
         verificationCodes.put(normalizedEmail, new VerificationCodeData(code, expiresAt));
+        self.sendVerificationEmailAsync(email, code);
     }
 
-    private void sendVerificationEmail(String email, String code) {
+    @Async
+    public void sendVerificationEmailAsync(String email, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailSenderAddress);
         message.setTo(email);
@@ -206,7 +217,7 @@ public class KlijentService {
         try {
             javaMailSender.send(message);
         } catch (MailException exception) {
-            throwValidationError("email", "Verifikacioni email nije mogao biti poslat. Proverite mail konfiguraciju.");
+            // Slanje mejla je asinhrono i ne sme da poništi već zapisani verifikacioni kod.
         }
     }
 

@@ -1,6 +1,5 @@
 package com.projekat.backend.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,8 +18,8 @@ public class Kategorija {
     private Long id;
     private String naziv;
 
-    @OneToMany(mappedBy = "kategorija", cascade = CascadeType.ALL)
-    private List<Specifikcija> specifikcije = new ArrayList<>();
+    @OneToMany(mappedBy = "kategorija")
+    private List<Fotoaparat> fotoaparati = new ArrayList<>();
 
     public Kategorija() {
     }

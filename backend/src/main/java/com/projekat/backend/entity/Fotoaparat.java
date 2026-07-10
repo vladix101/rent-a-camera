@@ -1,6 +1,5 @@
 package com.projekat.backend.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,11 +24,16 @@ public class Fotoaparat {
     private Boolean dostupan;
 
     @ManyToOne
+    @JoinColumn(name = "kategorija_id")
+    private Kategorija kategorija;
+
+    @ManyToOne
     @JoinColumn(name = "proizvodjac_id")
     private Proizvodjac proizvodjac;
 
-    @OneToMany(mappedBy = "fotoaparat", cascade = CascadeType.ALL)
-    private List<Specifikcija> specifikcije = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "specifikacija_id")
+    private Specifikacija specifikacija;
 
     @OneToMany(mappedBy = "fotoaparat")
     private List<Iznajmljivanje> iznajmljivanja = new ArrayList<>();

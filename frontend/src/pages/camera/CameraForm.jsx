@@ -2,18 +2,12 @@ import {useEffect, useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
 
 const emptyForm = {
-    proizvodjacNaziv: "",
+    proizvodjacId: "",
     kategorijaId: "",
+    specifikacijaId: "",
     datumKupovine: "",
     napomena: "",
-    dostupan: true,
-    rezolucija: "",
-    senzorSlike: "",
-    wifi: false,
-    ekran: "",
-    napajanje: "",
-    velicinaSlike: "",
-    opis: ""
+    dostupan: true
 }
 
 const toFormValues = (fotoaparat) => {
@@ -21,39 +15,44 @@ const toFormValues = (fotoaparat) => {
         return emptyForm
     }
     return {
-        proizvodjacNaziv: fotoaparat.proizvodjacNaziv ?? "",
+        proizvodjacId: fotoaparat.proizvodjacId ?? "",
         kategorijaId: fotoaparat.kategorijaId ?? "",
+        specifikacijaId: fotoaparat.specifikacijaId ?? "",
         datumKupovine: fotoaparat.datumKupovine ?? "",
         napomena: fotoaparat.napomena ?? "",
-        dostupan: fotoaparat.dostupan ?? true,
-        rezolucija: fotoaparat.rezolucija ?? "",
-        senzorSlike: fotoaparat.senzorSlike ?? "",
-        wifi: fotoaparat.wifi ?? false,
-        ekran: fotoaparat.ekran ?? "",
-        napajanje: fotoaparat.napajanje ?? "",
-        velicinaSlike: fotoaparat.velicinaSlike ?? "",
-        opis: fotoaparat.opis ?? ""
+        dostupan: fotoaparat.dostupan ?? true
     }
+}
+
+const opisSpecifikacije = (specifikacija) => {
+    const delovi = [specifikacija.rezolucija, specifikacija.senzorSlike].filter(Boolean).join(" · ")
+    const opis = specifikacija.opis ? specifikacija.opis.slice(0, 40) : ""
+    return [delovi, opis].filter(Boolean).join(" — ") || `Specifikacija #${specifikacija.id}`
 }
 
 const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmit, onCancel}) => {
     const [formData, setFormData] = useState(() => toFormValues(fotoaparat))
     const [kategorije, setKategorije] = useState([])
+    const [proizvodjaci, setProizvodjaci] = useState([])
+    const [specifikacije, setSpecifikacije] = useState([])
 
     useEffect(() => {
-        const fetchKategorije = async () => {
+        const fetchOptions = async () => {
             try {
-                const response = await fetch(apiUrl("/api/kategorije"))
-                if (!response.ok) {
-                    return
-                }
-                setKategorije(await response.json())
+                const [kategorijeRes, proizvodjaciRes, specifikacijeRes] = await Promise.all([
+                    fetch(apiUrl("/api/kategorije")),
+                    fetch(apiUrl("/api/proizvodjaci")),
+                    fetch(apiUrl("/api/specifikacije"))
+                ])
+                if (kategorijeRes.ok) setKategorije(await kategorijeRes.json())
+                if (proizvodjaciRes.ok) setProizvodjaci(await proizvodjaciRes.json())
+                if (specifikacijeRes.ok) setSpecifikacije(await specifikacijeRes.json())
             } catch (error) {
-                console.error("Error fetching kategorije:", error.message)
+                console.error("Error fetching form options:", error.message)
             }
         }
 
-        void fetchKategorije()
+        void fetchOptions()
     }, [])
 
     const handleChange = (event) => {
@@ -65,7 +64,9 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
         event.preventDefault()
         onSubmit({
             ...formData,
+            proizvodjacId: formData.proizvodjacId === "" ? null : Number(formData.proizvodjacId),
             kategorijaId: formData.kategorijaId === "" ? null : Number(formData.kategorijaId),
+            specifikacijaId: formData.specifikacijaId === "" ? null : Number(formData.specifikacijaId),
             datumKupovine: formData.datumKupovine === "" ? null : formData.datumKupovine
         })
     }
@@ -74,16 +75,14 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
         <form className="camera-form" onSubmit={handleSubmit}>
             <div className="camera-form-grid">
                 <div className="auth-field">
-                    <label htmlFor="proizvodjacNaziv">Proizvođač</label>
-                    <input
-                        id="proizvodjacNaziv"
-                        name="proizvodjacNaziv"
-                        type="text"
-                        placeholder="npr. Canon"
-                        value={formData.proizvodjacNaziv}
-                        onChange={handleChange}
-                    />
-                    {fieldErrors?.proizvodjacNaziv && <p className="field-error">{fieldErrors.proizvodjacNaziv}</p>}
+                    <label htmlFor="proizvodjacId">Proizvođač</label>
+                    <select id="proizvodjacId" name="proizvodjacId" value={formData.proizvodjacId} onChange={handleChange}>
+                        <option value="">Izaberite proizvođača</option>
+                        {proizvodjaci.map((proizvodjac) => (
+                            <option key={proizvodjac.id} value={proizvodjac.id}>{proizvodjac.name}</option>
+                        ))}
+                    </select>
+                    {fieldErrors?.proizvodjacId && <p className="field-error">{fieldErrors.proizvodjacId}</p>}
                 </div>
 
                 <div className="auth-field">
@@ -97,29 +96,15 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
                     {fieldErrors?.kategorijaId && <p className="field-error">{fieldErrors.kategorijaId}</p>}
                 </div>
 
-                <div className="auth-field">
-                    <label htmlFor="rezolucija">Rezolucija</label>
-                    <input id="rezolucija" name="rezolucija" type="text" placeholder="npr. 24MP" value={formData.rezolucija} onChange={handleChange}/>
-                </div>
-
-                <div className="auth-field">
-                    <label htmlFor="senzorSlike">Senzor slike</label>
-                    <input id="senzorSlike" name="senzorSlike" type="text" placeholder="npr. APS-C CMOS" value={formData.senzorSlike} onChange={handleChange}/>
-                </div>
-
-                <div className="auth-field">
-                    <label htmlFor="ekran">Ekran</label>
-                    <input id="ekran" name="ekran" type="text" placeholder='npr. 3.0" LCD' value={formData.ekran} onChange={handleChange}/>
-                </div>
-
-                <div className="auth-field">
-                    <label htmlFor="napajanje">Napajanje</label>
-                    <input id="napajanje" name="napajanje" type="text" placeholder="npr. Li-ion baterija" value={formData.napajanje} onChange={handleChange}/>
-                </div>
-
-                <div className="auth-field">
-                    <label htmlFor="velicinaSlike">Rezolucija slike</label>
-                    <input id="velicinaSlike" name="velicinaSlike" type="text" placeholder="npr. 6000x4000" value={formData.velicinaSlike} onChange={handleChange}/>
+                <div className="auth-field" style={{gridColumn: "1 / -1"}}>
+                    <label htmlFor="specifikacijaId">Specifikacija</label>
+                    <select id="specifikacijaId" name="specifikacijaId" value={formData.specifikacijaId} onChange={handleChange}>
+                        <option value="">Izaberite specifikaciju</option>
+                        {specifikacije.map((specifikacija) => (
+                            <option key={specifikacija.id} value={specifikacija.id}>{opisSpecifikacije(specifikacija)}</option>
+                        ))}
+                    </select>
+                    {fieldErrors?.specifikacijaId && <p className="field-error">{fieldErrors.specifikacijaId}</p>}
                 </div>
 
                 <div className="auth-field">
@@ -133,16 +118,7 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
                 <input id="napomena" name="napomena" type="text" placeholder="Interna napomena o stanju aparata" value={formData.napomena} onChange={handleChange}/>
             </div>
 
-            <div className="auth-field">
-                <label htmlFor="opis">Specifikacije / opis</label>
-                <textarea id="opis" name="opis" rows="4" placeholder="Detaljan opis fotoaparata i specifikacija" value={formData.opis} onChange={handleChange}/>
-            </div>
-
             <div className="camera-form-toggles">
-                <label className="camera-form-checkbox">
-                    <input type="checkbox" name="wifi" checked={formData.wifi} onChange={handleChange}/>
-                    Wi-Fi
-                </label>
                 <label className="camera-form-checkbox">
                     <input type="checkbox" name="dostupan" checked={formData.dostupan} onChange={handleChange}/>
                     Dostupan u ponudi

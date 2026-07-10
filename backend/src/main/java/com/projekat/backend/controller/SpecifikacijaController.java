@@ -1,8 +1,8 @@
 package com.projekat.backend.controller;
 
-import com.projekat.backend.dto.KategorijaDto;
+import com.projekat.backend.dto.SpecifikacijaDto;
 import com.projekat.backend.security.JwtUtil;
-import com.projekat.backend.service.KategorijaService;
+import com.projekat.backend.service.SpecifikacijaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,21 +20,21 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-public class KategorijaController {
+public class SpecifikacijaController {
 
-    private final KategorijaService kategorijaService;
+    private final SpecifikacijaService specifikacijaService;
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/kategorije")
-    public List<KategorijaDto> getKategorije() {
-        return kategorijaService.getKategorije();
+    @GetMapping("/specifikacije")
+    public List<SpecifikacijaDto> getSpecifikacije() {
+        return specifikacijaService.getSpecifikacije();
     }
 
-    @PostMapping("/kategorije")
-    public ResponseEntity<KategorijaDto> createKategorija(
+    @PostMapping("/specifikacije")
+    public ResponseEntity<SpecifikacijaDto> createSpecifikacija(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody KategorijaDto requestDto) {
+            @RequestBody SpecifikacijaDto requestDto) {
         jwtUtil.requireUserId(authHeader, "ZAPOSLENI");
-        return new ResponseEntity<>(kategorijaService.createKategorija(requestDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(specifikacijaService.createSpecifikacija(requestDto), HttpStatus.CREATED);
     }
 }
