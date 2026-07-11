@@ -15,9 +15,9 @@ const toFormValues = (fotoaparat) => {
         return emptyForm
     }
     return {
-        proizvodjacId: fotoaparat.proizvodjacId ?? "",
-        kategorijaId: fotoaparat.kategorijaId ?? "",
-        specifikacijaId: fotoaparat.specifikacijaId ?? "",
+        proizvodjacId: fotoaparat.proizvodjac?.id ?? "",
+        kategorijaId: fotoaparat.kategorija?.id ?? "",
+        specifikacijaId: fotoaparat.specifikacija?.id ?? "",
         datumKupovine: fotoaparat.datumKupovine ?? "",
         napomena: fotoaparat.napomena ?? "",
         dostupan: fotoaparat.dostupan ?? true

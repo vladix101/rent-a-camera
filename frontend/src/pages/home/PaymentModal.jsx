@@ -91,7 +91,7 @@ const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSu
                 <h2 id="payment-title">Plaćanje</h2>
 
                 <p className="payment-summary">
-                    <strong>{fotoaparat.proizvodjacNaziv}</strong>{fotoaparat.rezolucija ? ` · ${fotoaparat.rezolucija}` : ""}<br/>
+                    <strong>{fotoaparat.proizvodjac?.name}</strong>{fotoaparat.specifikacija?.rezolucija ? ` · ${fotoaparat.specifikacija.rezolucija}` : ""}<br/>
                     {formatDateSrb(datumOd)} - {formatDateSrb(datumDo)}<br/>
                     Klijent: <strong>{klijentIme}</strong>
                 </p>

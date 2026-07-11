@@ -2,6 +2,9 @@ package com.projekat.backend.service;
 
 import com.projekat.backend.dto.FotoaparatDto;
 import com.projekat.backend.dto.FotoaparatRequestDto;
+import com.projekat.backend.dto.KategorijaDto;
+import com.projekat.backend.dto.ProizvodjacDto;
+import com.projekat.backend.dto.SpecifikacijaDto;
 import com.projekat.backend.dto.ZauzetostDto;
 import com.projekat.backend.entity.Fotoaparat;
 import com.projekat.backend.entity.Iznajmljivanje;
@@ -152,23 +155,27 @@ public class FotoaparatService {
         Proizvodjac proizvodjac = fotoaparat.getProizvodjac();
         boolean dostupanZaPeriod = Boolean.TRUE.equals(fotoaparat.getDostupan()) && !zauzetiFotoaparatIds.contains(fotoaparat.getId());
 
+        KategorijaDto kategorijaDto = kategorija == null ? null : new KategorijaDto(kategorija.getId(), kategorija.getNaziv());
+        ProizvodjacDto proizvodjacDto = proizvodjac == null ? null : new ProizvodjacDto(proizvodjac.getId(), proizvodjac.getName());
+        SpecifikacijaDto specifikacijaDto = specifikacija == null ? null : new SpecifikacijaDto(
+                specifikacija.getId(),
+                specifikacija.getRezolucija(),
+                specifikacija.getSenzorSlike(),
+                specifikacija.getWifi(),
+                specifikacija.getEkran(),
+                specifikacija.getNapajanje(),
+                specifikacija.getVelicinaSlike(),
+                specifikacija.getOpis()
+        );
+
         return new FotoaparatDto(
                 fotoaparat.getId(),
                 fotoaparat.getDatumKupovine(),
                 fotoaparat.getNapomena(),
                 fotoaparat.getDostupan(),
-                proizvodjac == null ? null : proizvodjac.getId(),
-                proizvodjac == null ? null : proizvodjac.getName(),
-                kategorija == null ? null : kategorija.getId(),
-                kategorija == null ? null : kategorija.getNaziv(),
-                specifikacija == null ? null : specifikacija.getId(),
-                specifikacija == null ? null : specifikacija.getRezolucija(),
-                specifikacija == null ? null : specifikacija.getSenzorSlike(),
-                specifikacija == null ? null : specifikacija.getWifi(),
-                specifikacija == null ? null : specifikacija.getEkran(),
-                specifikacija == null ? null : specifikacija.getNapajanje(),
-                specifikacija == null ? null : specifikacija.getVelicinaSlike(),
-                specifikacija == null ? null : specifikacija.getOpis(),
+                kategorijaDto,
+                proizvodjacDto,
+                specifikacijaDto,
                 dostupanZaPeriod
         );
     }

@@ -52,9 +52,9 @@ const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => 
                 <button type="button" className="camera-modal-close" onClick={onClose} aria-label="Zatvori">×</button>
 
                 <div className="camera-modal-art">
-                    <img src={getCameraImage(fotoaparat.kategorijaNaziv)} alt={fotoaparat.kategorijaNaziv || "Fotoaparat"}/>
-                    {fotoaparat.kategorijaNaziv && (
-                        <span className="camera-card-category">{fotoaparat.kategorijaNaziv}</span>
+                    <img src={getCameraImage(fotoaparat.kategorija?.naziv)} alt={fotoaparat.kategorija?.naziv || "Fotoaparat"}/>
+                    {fotoaparat.kategorija?.naziv && (
+                        <span className="camera-card-category">{fotoaparat.kategorija.naziv}</span>
                     )}
                     <span className={`camera-card-badge ${fotoaparat.dostupanZaPeriod ? "available" : "unavailable"}`}>
                         {fotoaparat.dostupanZaPeriod ? "Dostupan" : "Nije dostupan"}
@@ -63,27 +63,27 @@ const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => 
 
                 <div className="camera-modal-body">
                     <div className="camera-modal-info">
-                        <p className="manufacturer">{fotoaparat.proizvodjacNaziv || "Nepoznat proizvođač"}</p>
+                        <p className="manufacturer">{fotoaparat.proizvodjac?.name || "Nepoznat proizvođač"}</p>
                         <h2 id="camera-modal-title">
-                            {fotoaparat.rezolucija ? `${fotoaparat.proizvodjacNaziv} · ${fotoaparat.rezolucija}` : fotoaparat.proizvodjacNaziv}
+                            {fotoaparat.specifikacija?.rezolucija ? `${fotoaparat.proizvodjac?.name} · ${fotoaparat.specifikacija.rezolucija}` : fotoaparat.proizvodjac?.name}
                         </h2>
 
-                        {fotoaparat.opis && <p className="description">{fotoaparat.opis}</p>}
+                        {fotoaparat.specifikacija?.opis && <p className="description">{fotoaparat.specifikacija.opis}</p>}
 
                         <div className="camera-modal-specs">
-                            {fotoaparat.senzorSlike && (
-                                <div><span>Senzor</span><strong>{fotoaparat.senzorSlike}</strong></div>
+                            {fotoaparat.specifikacija?.senzorSlike && (
+                                <div><span>Senzor</span><strong>{fotoaparat.specifikacija.senzorSlike}</strong></div>
                             )}
-                            {fotoaparat.ekran && (
-                                <div><span>Ekran</span><strong>{fotoaparat.ekran}</strong></div>
+                            {fotoaparat.specifikacija?.ekran && (
+                                <div><span>Ekran</span><strong>{fotoaparat.specifikacija.ekran}</strong></div>
                             )}
-                            {fotoaparat.velicinaSlike && (
-                                <div><span>Rezolucija slike</span><strong>{fotoaparat.velicinaSlike}</strong></div>
+                            {fotoaparat.specifikacija?.velicinaSlike && (
+                                <div><span>Rezolucija slike</span><strong>{fotoaparat.specifikacija.velicinaSlike}</strong></div>
                             )}
-                            {fotoaparat.napajanje && (
-                                <div><span>Napajanje</span><strong>{fotoaparat.napajanje}</strong></div>
+                            {fotoaparat.specifikacija?.napajanje && (
+                                <div><span>Napajanje</span><strong>{fotoaparat.specifikacija.napajanje}</strong></div>
                             )}
-                            <div><span>Wi-Fi</span><strong>{fotoaparat.wifi ? "Da" : "Ne"}</strong></div>
+                            <div><span>Wi-Fi</span><strong>{fotoaparat.specifikacija?.wifi ? "Da" : "Ne"}</strong></div>
                             {fotoaparat.datumKupovine && (
                                 <div><span>Datum nabavke</span><strong>{new Date(fotoaparat.datumKupovine).toLocaleDateString("sr-Latn-RS")}</strong></div>
                             )}

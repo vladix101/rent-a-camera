@@ -7,44 +7,24 @@ public class FotoaparatDto {
     private LocalDate datumKupovine;
     private String napomena;
     private Boolean dostupan;
-    private Long proizvodjacId;
-    private String proizvodjacNaziv;
-    private Long kategorijaId;
-    private String kategorijaNaziv;
-    private Long specifikacijaId;
-    private String rezolucija;
-    private String senzorSlike;
-    private Boolean wifi;
-    private String ekran;
-    private String napajanje;
-    private String velicinaSlike;
-    private String opis;
+    private KategorijaDto kategorija;
+    private ProizvodjacDto proizvodjac;
+    private SpecifikacijaDto specifikacija;
     private Boolean dostupanZaPeriod;
 
     public FotoaparatDto() {
     }
 
     public FotoaparatDto(Long id, LocalDate datumKupovine, String napomena, Boolean dostupan,
-                          Long proizvodjacId, String proizvodjacNaziv, Long kategorijaId, String kategorijaNaziv,
-                          Long specifikacijaId, String rezolucija, String senzorSlike,
-                          Boolean wifi, String ekran, String napajanje, String velicinaSlike, String opis,
+                          KategorijaDto kategorija, ProizvodjacDto proizvodjac, SpecifikacijaDto specifikacija,
                           Boolean dostupanZaPeriod) {
         this.id = id;
         this.datumKupovine = datumKupovine;
         this.napomena = napomena;
         this.dostupan = dostupan;
-        this.proizvodjacId = proizvodjacId;
-        this.proizvodjacNaziv = proizvodjacNaziv;
-        this.kategorijaId = kategorijaId;
-        this.kategorijaNaziv = kategorijaNaziv;
-        this.specifikacijaId = specifikacijaId;
-        this.rezolucija = rezolucija;
-        this.senzorSlike = senzorSlike;
-        this.wifi = wifi;
-        this.ekran = ekran;
-        this.napajanje = napajanje;
-        this.velicinaSlike = velicinaSlike;
-        this.opis = opis;
+        this.kategorija = kategorija;
+        this.proizvodjac = proizvodjac;
+        this.specifikacija = specifikacija;
         this.dostupanZaPeriod = dostupanZaPeriod;
     }
 
@@ -80,100 +60,28 @@ public class FotoaparatDto {
         this.dostupan = dostupan;
     }
 
-    public Long getProizvodjacId() {
-        return proizvodjacId;
+    public KategorijaDto getKategorija() {
+        return kategorija;
     }
 
-    public void setProizvodjacId(Long proizvodjacId) {
-        this.proizvodjacId = proizvodjacId;
+    public void setKategorija(KategorijaDto kategorija) {
+        this.kategorija = kategorija;
     }
 
-    public String getProizvodjacNaziv() {
-        return proizvodjacNaziv;
+    public ProizvodjacDto getProizvodjac() {
+        return proizvodjac;
     }
 
-    public void setProizvodjacNaziv(String proizvodjacNaziv) {
-        this.proizvodjacNaziv = proizvodjacNaziv;
+    public void setProizvodjac(ProizvodjacDto proizvodjac) {
+        this.proizvodjac = proizvodjac;
     }
 
-    public Long getKategorijaId() {
-        return kategorijaId;
+    public SpecifikacijaDto getSpecifikacija() {
+        return specifikacija;
     }
 
-    public void setKategorijaId(Long kategorijaId) {
-        this.kategorijaId = kategorijaId;
-    }
-
-    public String getKategorijaNaziv() {
-        return kategorijaNaziv;
-    }
-
-    public void setKategorijaNaziv(String kategorijaNaziv) {
-        this.kategorijaNaziv = kategorijaNaziv;
-    }
-
-    public Long getSpecifikacijaId() {
-        return specifikacijaId;
-    }
-
-    public void setSpecifikacijaId(Long specifikacijaId) {
-        this.specifikacijaId = specifikacijaId;
-    }
-
-    public String getRezolucija() {
-        return rezolucija;
-    }
-
-    public void setRezolucija(String rezolucija) {
-        this.rezolucija = rezolucija;
-    }
-
-    public String getSenzorSlike() {
-        return senzorSlike;
-    }
-
-    public void setSenzorSlike(String senzorSlike) {
-        this.senzorSlike = senzorSlike;
-    }
-
-    public Boolean getWifi() {
-        return wifi;
-    }
-
-    public void setWifi(Boolean wifi) {
-        this.wifi = wifi;
-    }
-
-    public String getEkran() {
-        return ekran;
-    }
-
-    public void setEkran(String ekran) {
-        this.ekran = ekran;
-    }
-
-    public String getNapajanje() {
-        return napajanje;
-    }
-
-    public void setNapajanje(String napajanje) {
-        this.napajanje = napajanje;
-    }
-
-    public String getVelicinaSlike() {
-        return velicinaSlike;
-    }
-
-    public void setVelicinaSlike(String velicinaSlike) {
-        this.velicinaSlike = velicinaSlike;
-    }
-
-    public String getOpis() {
-        return opis;
-    }
-
-    public void setOpis(String opis) {
-        this.opis = opis;
+    public void setSpecifikacija(SpecifikacijaDto specifikacija) {
+        this.specifikacija = specifikacija;
     }
 
     public Boolean getDostupanZaPeriod() {

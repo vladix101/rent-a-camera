@@ -92,10 +92,10 @@ const Home = ({loggedInUser}) => {
         }
         return fotoaparati.filter((fotoaparat) => {
             const haystack = [
-                fotoaparat.proizvodjacNaziv,
-                fotoaparat.kategorijaNaziv,
-                fotoaparat.rezolucija,
-                fotoaparat.opis
+                fotoaparat.proizvodjac?.name,
+                fotoaparat.kategorija?.naziv,
+                fotoaparat.specifikacija?.rezolucija,
+                fotoaparat.specifikacija?.opis
             ].filter(Boolean).join(" ").toLowerCase()
             return haystack.includes(term)
         })
@@ -108,7 +108,7 @@ const Home = ({loggedInUser}) => {
 
     const handleDelete = async (event, fotoaparat) => {
         event.stopPropagation()
-        const displayName = `${fotoaparat.proizvodjacNaziv ?? ""} ${fotoaparat.rezolucija ?? ""}`.trim()
+        const displayName = `${fotoaparat.proizvodjac?.name ?? ""} ${fotoaparat.specifikacija?.rezolucija ?? ""}`.trim()
         if (!window.confirm(`Da li ste sigurni da želite da obrišete fotoaparat "${displayName}"?`)) {
             return
         }
@@ -193,9 +193,9 @@ const Home = ({loggedInUser}) => {
                         onClick={() => setSelectedFotoaparat(fotoaparat)}
                     >
                         <div className="camera-card-art">
-                            <img src={getCameraImage(fotoaparat.kategorijaNaziv)} alt={fotoaparat.kategorijaNaziv || "Fotoaparat"}/>
-                            {fotoaparat.kategorijaNaziv && (
-                                <span className="camera-card-category">{fotoaparat.kategorijaNaziv}</span>
+                            <img src={getCameraImage(fotoaparat.kategorija?.naziv)} alt={fotoaparat.kategorija?.naziv || "Fotoaparat"}/>
+                            {fotoaparat.kategorija?.naziv && (
+                                <span className="camera-card-category">{fotoaparat.kategorija.naziv}</span>
                             )}
                             <span className={`camera-card-badge ${fotoaparat.dostupanZaPeriod ? "available" : "unavailable"}`}>
                                 {fotoaparat.dostupanZaPeriod ? "Dostupan" : "Nije dostupan"}
@@ -203,40 +203,40 @@ const Home = ({loggedInUser}) => {
                         </div>
 
                         <div className="camera-card-body">
-                            <p className="manufacturer">{fotoaparat.proizvodjacNaziv || "Nepoznat proizvođač"}</p>
-                            <h2>{fotoaparat.rezolucija ? `${fotoaparat.proizvodjacNaziv} · ${fotoaparat.rezolucija}` : fotoaparat.proizvodjacNaziv}</h2>
+                            <p className="manufacturer">{fotoaparat.proizvodjac?.name || "Nepoznat proizvođač"}</p>
+                            <h2>{fotoaparat.specifikacija?.rezolucija ? `${fotoaparat.proizvodjac?.name} · ${fotoaparat.specifikacija.rezolucija}` : fotoaparat.proizvodjac?.name}</h2>
 
-                            {fotoaparat.opis && <p className="camera-card-desc">{fotoaparat.opis}</p>}
+                            {fotoaparat.specifikacija?.opis && <p className="camera-card-desc">{fotoaparat.specifikacija.opis}</p>}
 
                             <div className="camera-spec-list">
-                                {fotoaparat.senzorSlike && (
+                                {fotoaparat.specifikacija?.senzorSlike && (
                                     <div>
                                         <span>Senzor</span>
-                                        <strong>{fotoaparat.senzorSlike}</strong>
+                                        <strong>{fotoaparat.specifikacija.senzorSlike}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.ekran && (
+                                {fotoaparat.specifikacija?.ekran && (
                                     <div>
                                         <span>Ekran</span>
-                                        <strong>{fotoaparat.ekran}</strong>
+                                        <strong>{fotoaparat.specifikacija.ekran}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.velicinaSlike && (
+                                {fotoaparat.specifikacija?.velicinaSlike && (
                                     <div>
                                         <span>Rezolucija slike</span>
-                                        <strong>{fotoaparat.velicinaSlike}</strong>
+                                        <strong>{fotoaparat.specifikacija.velicinaSlike}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.napajanje && (
+                                {fotoaparat.specifikacija?.napajanje && (
                                     <div>
                                         <span>Napajanje</span>
-                                        <strong>{fotoaparat.napajanje}</strong>
+                                        <strong>{fotoaparat.specifikacija.napajanje}</strong>
                                     </div>
                                 )}
                             </div>
 
                             <div className="camera-card-footer">
-                                {fotoaparat.wifi ? (
+                                {fotoaparat.specifikacija?.wifi ? (
                                     <span className="wifi-chip">Wi-Fi</span>
                                 ) : <span/>}
                                 {fotoaparat.napomena && <span className="note-text">{fotoaparat.napomena}</span>}
