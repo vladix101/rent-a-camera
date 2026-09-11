@@ -4,41 +4,41 @@ import {getCameraImage} from "../../utils/cameraImages.js"
 import OccupancyCalendar from "./OccupancyCalendar.jsx"
 import PaymentModal from "./PaymentModal.jsx"
 
-const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => {
-    const [zauzetost, setZauzetost] = useState([])
+const CameraModal = ({camera, loggedInUser, onClose, onBookingComplete}) => {
+    const [occupancy, setOccupancy] = useState([])
     const [selectedStart, setSelectedStart] = useState(null)
     const [selectedEnd, setSelectedEnd] = useState(null)
     const [showPayment, setShowPayment] = useState(false)
 
-    const isKlijent = loggedInUser?.userType === "KLIJENT"
+    const isClient = loggedInUser?.userType === "CLIENT"
 
     useEffect(() => {
-        const fetchZauzetost = async () => {
+        const fetchOccupancy = async () => {
             try {
-                const response = await fetch(apiUrl(`/api/fotoaparati/${fotoaparat.id}/zauzetost`))
+                const response = await fetch(apiUrl(`/api/cameras/${camera.id}/occupancy`))
                 if (!response.ok) {
                     return
                 }
-                setZauzetost(await response.json())
+                setOccupancy(await response.json())
             } catch (error) {
-                console.error("Error fetching zauzetost:", error.message)
+                console.error("Error fetching occupancy:", error.message)
             }
         }
 
-        void fetchZauzetost()
-    }, [fotoaparat.id])
+        void fetchOccupancy()
+    }, [camera.id])
 
     const handleSelect = (start, end) => {
         setSelectedStart(start)
         setSelectedEnd(end)
     }
 
-    const handleBookingSuccess = (iznajmljivanje) => {
+    const handleBookingSuccess = (rental) => {
         setShowPayment(false)
-        onBookingComplete(iznajmljivanje)
+        onBookingComplete(rental)
     }
 
-    const canBook = isKlijent && selectedStart && selectedEnd
+    const canBook = isClient && selectedStart && selectedEnd
 
     return (
         <div className="modal-backdrop" role="presentation" onClick={onClose}>
@@ -49,56 +49,56 @@ const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => 
                 aria-labelledby="camera-modal-title"
                 onClick={(event) => event.stopPropagation()}
             >
-                <button type="button" className="camera-modal-close" onClick={onClose} aria-label="Zatvori">×</button>
+                <button type="button" className="camera-modal-close" onClick={onClose} aria-label="Close">×</button>
 
                 <div className="camera-modal-art">
-                    <img src={getCameraImage(fotoaparat.kategorija?.naziv)} alt={fotoaparat.kategorija?.naziv || "Fotoaparat"}/>
-                    {fotoaparat.kategorija?.naziv && (
-                        <span className="camera-card-category">{fotoaparat.kategorija.naziv}</span>
+                    <img src={getCameraImage(camera.category?.name)} alt={camera.category?.name || "Camera"}/>
+                    {camera.category?.name && (
+                        <span className="camera-card-category">{camera.category.name}</span>
                     )}
-                    <span className={`camera-card-badge ${fotoaparat.dostupanZaPeriod ? "available" : "unavailable"}`}>
-                        {fotoaparat.dostupanZaPeriod ? "Dostupan" : "Nije dostupan"}
+                    <span className={`camera-card-badge ${camera.availableForPeriod ? "available" : "unavailable"}`}>
+                        {camera.availableForPeriod ? "Available" : "Unavailable"}
                     </span>
                 </div>
 
                 <div className="camera-modal-body">
                     <div className="camera-modal-info">
-                        <p className="manufacturer">{fotoaparat.proizvodjac?.name || "Nepoznat proizvođač"}</p>
+                        <p className="manufacturer">{camera.manufacturer?.name || "Unknown manufacturer"}</p>
                         <h2 id="camera-modal-title">
-                            {fotoaparat.specifikacija?.rezolucija ? `${fotoaparat.proizvodjac?.name} · ${fotoaparat.specifikacija.rezolucija}` : fotoaparat.proizvodjac?.name}
+                            {camera.specification?.resolution ? `${camera.manufacturer?.name} · ${camera.specification.resolution}` : camera.manufacturer?.name}
                         </h2>
 
-                        {fotoaparat.specifikacija?.opis && <p className="description">{fotoaparat.specifikacija.opis}</p>}
+                        {camera.specification?.description && <p className="description">{camera.specification.description}</p>}
 
                         <div className="camera-modal-specs">
-                            {fotoaparat.specifikacija?.senzorSlike && (
-                                <div><span>Senzor</span><strong>{fotoaparat.specifikacija.senzorSlike}</strong></div>
+                            {camera.specification?.imageSensor && (
+                                <div><span>Sensor</span><strong>{camera.specification.imageSensor}</strong></div>
                             )}
-                            {fotoaparat.specifikacija?.ekran && (
-                                <div><span>Ekran</span><strong>{fotoaparat.specifikacija.ekran}</strong></div>
+                            {camera.specification?.screen && (
+                                <div><span>Screen</span><strong>{camera.specification.screen}</strong></div>
                             )}
-                            {fotoaparat.specifikacija?.velicinaSlike && (
-                                <div><span>Rezolucija slike</span><strong>{fotoaparat.specifikacija.velicinaSlike}</strong></div>
+                            {camera.specification?.imageSize && (
+                                <div><span>Image resolution</span><strong>{camera.specification.imageSize}</strong></div>
                             )}
-                            {fotoaparat.specifikacija?.napajanje && (
-                                <div><span>Napajanje</span><strong>{fotoaparat.specifikacija.napajanje}</strong></div>
+                            {camera.specification?.power && (
+                                <div><span>Power</span><strong>{camera.specification.power}</strong></div>
                             )}
-                            <div><span>Wi-Fi</span><strong>{fotoaparat.specifikacija?.wifi ? "Da" : "Ne"}</strong></div>
-                            {fotoaparat.datumKupovine && (
-                                <div><span>Datum nabavke</span><strong>{new Date(fotoaparat.datumKupovine).toLocaleDateString("sr-Latn-RS")}</strong></div>
+                            <div><span>Wi-Fi</span><strong>{camera.specification?.wifi ? "Da" : "Ne"}</strong></div>
+                            {camera.purchaseDate && (
+                                <div><span>Purchase date</span><strong>{new Date(camera.purchaseDate).toLocaleDateString("en-GB")}</strong></div>
                             )}
-                            <div><span>Status</span><strong>{fotoaparat.dostupan ? "U ponudi" : "Van upotrebe"}</strong></div>
-                            {fotoaparat.napomena && (
-                                <div><span>Napomena</span><strong>{fotoaparat.napomena}</strong></div>
+                            <div><span>Status</span><strong>{camera.available ? "In fleet" : "Out of service"}</strong></div>
+                            {camera.note && (
+                                <div><span>Note</span><strong>{camera.note}</strong></div>
                             )}
                         </div>
                     </div>
 
                     <div className="camera-modal-booking">
-                        <h3>Kalendar dostupnosti</h3>
+                        <h3>Availability calendar</h3>
                         <OccupancyCalendar
-                            zauzetost={zauzetost}
-                            readOnly={!isKlijent}
+                            occupancy={occupancy}
+                            readOnly={!isClient}
                             selectedStart={selectedStart}
                             selectedEnd={selectedEnd}
                             onSelect={handleSelect}
@@ -106,30 +106,30 @@ const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => 
 
                         {!loggedInUser && (
                             <p className="calendar-hint guest">
-                                Prijavite se kao klijent da biste mogli da izaberete period i iznajmite fotoaparat.
+                                Sign in as a client to pick a period and rent this camera.
                             </p>
                         )}
-                        {loggedInUser && !isKlijent && (
+                        {loggedInUser && !isClient && (
                             <p className="calendar-hint guest">
-                                Iznajmljivanje je dostupno samo prijavljenim klijentima.
+                                Renting is available to signed-in clients only.
                             </p>
                         )}
-                        {isKlijent && (
+                        {isClient && (
                             <p className="calendar-hint">
                                 {selectedStart && selectedEnd
-                                    ? `Izabrani period: ${selectedStart} - ${selectedEnd}`
-                                    : "Izaberite datum početka i datum završetka na kalendaru."}
+                                    ? `Selected period: ${selectedStart} - ${selectedEnd}`
+                                    : "Pick a start date and an end date on the calendar."}
                             </p>
                         )}
 
-                        {isKlijent && (
+                        {isClient && (
                             <button
                                 type="button"
                                 className="book-button"
-                                disabled={!canBook || !fotoaparat.dostupan}
+                                disabled={!canBook || !camera.available}
                                 onClick={() => setShowPayment(true)}
                             >
-                                Iznajmi
+                                Rent
                             </button>
                         )}
                     </div>
@@ -138,9 +138,9 @@ const CameraModal = ({fotoaparat, loggedInUser, onClose, onBookingComplete}) => 
 
             {showPayment && (
                 <PaymentModal
-                    fotoaparat={fotoaparat}
-                    datumOd={selectedStart}
-                    datumDo={selectedEnd}
+                    camera={camera}
+                    dateFrom={selectedStart}
+                    dateTo={selectedEnd}
                     loggedInUser={loggedInUser}
                     onClose={() => setShowPayment(false)}
                     onSuccess={handleBookingSuccess}

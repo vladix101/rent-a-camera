@@ -2,51 +2,51 @@ import {useEffect, useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
 
 const emptyForm = {
-    proizvodjacId: "",
-    kategorijaId: "",
-    specifikacijaId: "",
-    datumKupovine: "",
-    napomena: "",
-    dostupan: true
+    manufacturerId: "",
+    categoryId: "",
+    specificationId: "",
+    purchaseDate: "",
+    note: "",
+    available: true
 }
 
-const toFormValues = (fotoaparat) => {
-    if (!fotoaparat) {
+const toFormValues = (camera) => {
+    if (!camera) {
         return emptyForm
     }
     return {
-        proizvodjacId: fotoaparat.proizvodjac?.id ?? "",
-        kategorijaId: fotoaparat.kategorija?.id ?? "",
-        specifikacijaId: fotoaparat.specifikacija?.id ?? "",
-        datumKupovine: fotoaparat.datumKupovine ?? "",
-        napomena: fotoaparat.napomena ?? "",
-        dostupan: fotoaparat.dostupan ?? true
+        manufacturerId: camera.manufacturer?.id ?? "",
+        categoryId: camera.category?.id ?? "",
+        specificationId: camera.specification?.id ?? "",
+        purchaseDate: camera.purchaseDate ?? "",
+        note: camera.note ?? "",
+        available: camera.available ?? true
     }
 }
 
-const opisSpecifikacije = (specifikacija) => {
-    const delovi = [specifikacija.rezolucija, specifikacija.senzorSlike].filter(Boolean).join(" · ")
-    const opis = specifikacija.opis ? specifikacija.opis.slice(0, 40) : ""
-    return [delovi, opis].filter(Boolean).join(" — ") || `Specifikacija #${specifikacija.id}`
+const specificationLabel = (specification) => {
+    const parts = [specification.resolution, specification.imageSensor].filter(Boolean).join(" · ")
+    const description = specification.description ? specification.description.slice(0, 40) : ""
+    return [parts, description].filter(Boolean).join(" — ") || `Specification #${specification.id}`
 }
 
-const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmit, onCancel}) => {
-    const [formData, setFormData] = useState(() => toFormValues(fotoaparat))
-    const [kategorije, setKategorije] = useState([])
-    const [proizvodjaci, setProizvodjaci] = useState([])
-    const [specifikacije, setSpecifikacije] = useState([])
+const CameraForm = ({camera, submitLabel, isSubmitting, fieldErrors, onSubmit, onCancel}) => {
+    const [formData, setFormData] = useState(() => toFormValues(camera))
+    const [categories, setCategories] = useState([])
+    const [manufacturers, setManufacturers] = useState([])
+    const [specifications, setSpecifications] = useState([])
 
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                const [kategorijeRes, proizvodjaciRes, specifikacijeRes] = await Promise.all([
-                    fetch(apiUrl("/api/kategorije")),
-                    fetch(apiUrl("/api/proizvodjaci")),
-                    fetch(apiUrl("/api/specifikacije"))
+                const [categoriesRes, manufacturersRes, specificationsRes] = await Promise.all([
+                    fetch(apiUrl("/api/categories")),
+                    fetch(apiUrl("/api/manufacturers")),
+                    fetch(apiUrl("/api/specifications"))
                 ])
-                if (kategorijeRes.ok) setKategorije(await kategorijeRes.json())
-                if (proizvodjaciRes.ok) setProizvodjaci(await proizvodjaciRes.json())
-                if (specifikacijeRes.ok) setSpecifikacije(await specifikacijeRes.json())
+                if (categoriesRes.ok) setCategories(await categoriesRes.json())
+                if (manufacturersRes.ok) setManufacturers(await manufacturersRes.json())
+                if (specificationsRes.ok) setSpecifications(await specificationsRes.json())
             } catch (error) {
                 console.error("Error fetching form options:", error.message)
             }
@@ -64,10 +64,10 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
         event.preventDefault()
         onSubmit({
             ...formData,
-            proizvodjacId: formData.proizvodjacId === "" ? null : Number(formData.proizvodjacId),
-            kategorijaId: formData.kategorijaId === "" ? null : Number(formData.kategorijaId),
-            specifikacijaId: formData.specifikacijaId === "" ? null : Number(formData.specifikacijaId),
-            datumKupovine: formData.datumKupovine === "" ? null : formData.datumKupovine
+            manufacturerId: formData.manufacturerId === "" ? null : Number(formData.manufacturerId),
+            categoryId: formData.categoryId === "" ? null : Number(formData.categoryId),
+            specificationId: formData.specificationId === "" ? null : Number(formData.specificationId),
+            purchaseDate: formData.purchaseDate === "" ? null : formData.purchaseDate
         })
     }
 
@@ -75,53 +75,53 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
         <form className="camera-form" onSubmit={handleSubmit}>
             <div className="camera-form-grid">
                 <div className="auth-field">
-                    <label htmlFor="proizvodjacId">Proizvođač</label>
-                    <select id="proizvodjacId" name="proizvodjacId" value={formData.proizvodjacId} onChange={handleChange}>
-                        <option value="">Izaberite proizvođača</option>
-                        {proizvodjaci.map((proizvodjac) => (
-                            <option key={proizvodjac.id} value={proizvodjac.id}>{proizvodjac.name}</option>
+                    <label htmlFor="manufacturerId">Manufacturer</label>
+                    <select id="manufacturerId" name="manufacturerId" value={formData.manufacturerId} onChange={handleChange}>
+                        <option value="">Select a manufacturer</option>
+                        {manufacturers.map((manufacturer) => (
+                            <option key={manufacturer.id} value={manufacturer.id}>{manufacturer.name}</option>
                         ))}
                     </select>
-                    {fieldErrors?.proizvodjacId && <p className="field-error">{fieldErrors.proizvodjacId}</p>}
+                    {fieldErrors?.manufacturerId && <p className="field-error">{fieldErrors.manufacturerId}</p>}
                 </div>
 
                 <div className="auth-field">
-                    <label htmlFor="kategorijaId">Kategorija</label>
-                    <select id="kategorijaId" name="kategorijaId" value={formData.kategorijaId} onChange={handleChange}>
-                        <option value="">Izaberite kategoriju</option>
-                        {kategorije.map((kategorija) => (
-                            <option key={kategorija.id} value={kategorija.id}>{kategorija.naziv}</option>
+                    <label htmlFor="categoryId">Category</label>
+                    <select id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange}>
+                        <option value="">Select a category</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </select>
-                    {fieldErrors?.kategorijaId && <p className="field-error">{fieldErrors.kategorijaId}</p>}
+                    {fieldErrors?.categoryId && <p className="field-error">{fieldErrors.categoryId}</p>}
                 </div>
 
                 <div className="auth-field" style={{gridColumn: "1 / -1"}}>
-                    <label htmlFor="specifikacijaId">Specifikacija</label>
-                    <select id="specifikacijaId" name="specifikacijaId" value={formData.specifikacijaId} onChange={handleChange}>
-                        <option value="">Izaberite specifikaciju</option>
-                        {specifikacije.map((specifikacija) => (
-                            <option key={specifikacija.id} value={specifikacija.id}>{opisSpecifikacije(specifikacija)}</option>
+                    <label htmlFor="specificationId">Specification</label>
+                    <select id="specificationId" name="specificationId" value={formData.specificationId} onChange={handleChange}>
+                        <option value="">Select a specification</option>
+                        {specifications.map((specification) => (
+                            <option key={specification.id} value={specification.id}>{specificationLabel(specification)}</option>
                         ))}
                     </select>
-                    {fieldErrors?.specifikacijaId && <p className="field-error">{fieldErrors.specifikacijaId}</p>}
+                    {fieldErrors?.specificationId && <p className="field-error">{fieldErrors.specificationId}</p>}
                 </div>
 
                 <div className="auth-field">
-                    <label htmlFor="datumKupovine">Datum nabavke</label>
-                    <input id="datumKupovine" name="datumKupovine" type="date" value={formData.datumKupovine} onChange={handleChange}/>
+                    <label htmlFor="purchaseDate">Purchase date</label>
+                    <input id="purchaseDate" name="purchaseDate" type="date" value={formData.purchaseDate} onChange={handleChange}/>
                 </div>
             </div>
 
             <div className="auth-field">
-                <label htmlFor="napomena">Napomena</label>
-                <input id="napomena" name="napomena" type="text" placeholder="Interna napomena o stanju aparata" value={formData.napomena} onChange={handleChange}/>
+                <label htmlFor="note">Note</label>
+                <input id="note" name="note" type="text" placeholder="Internal note about the camera's condition" value={formData.note} onChange={handleChange}/>
             </div>
 
             <div className="camera-form-toggles">
                 <label className="camera-form-checkbox">
-                    <input type="checkbox" name="dostupan" checked={formData.dostupan} onChange={handleChange}/>
-                    Dostupan u ponudi
+                    <input type="checkbox" name="available" checked={formData.available} onChange={handleChange}/>
+                    Available for rent
                 </label>
             </div>
 
@@ -129,10 +129,10 @@ const CameraForm = ({fotoaparat, submitLabel, isSubmitting, fieldErrors, onSubmi
 
             <div className="verification-actions">
                 <button type="button" className="btn-secondary" onClick={onCancel} disabled={isSubmitting}>
-                    Otkaži
+                    Cancel
                 </button>
                 <button type="submit" className="auth-submit" disabled={isSubmitting} style={{width: "auto", padding: "0 20px"}}>
-                    {isSubmitting ? "Čuvanje..." : submitLabel}
+                    {isSubmitting ? "Saving..." : submitLabel}
                 </button>
             </div>
         </form>

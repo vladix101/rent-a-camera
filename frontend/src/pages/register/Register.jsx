@@ -7,9 +7,9 @@ const Register = () => {
     const navigate = useNavigate()
 
     const [formData, setFormData] = useState({
-        ime: "",
-        prezime: "",
-        starost: "",
+        firstName: "",
+        lastName: "",
+        age: "",
         username: "",
         password: "",
         email: ""
@@ -37,12 +37,12 @@ const Register = () => {
         setFieldErrors({})
         const dataToSend = {
             ...formData,
-            starost: formData.starost === "" ? null : Number(formData.starost)
+            age: formData.age === "" ? null : Number(formData.age)
         }
 
         setIsRegistering(true)
         try {
-            const response = await fetch(apiUrl("/api/klijenti/register"), {
+            const response = await fetch(apiUrl("/api/clients/register"), {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(dataToSend)
@@ -50,7 +50,7 @@ const Register = () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Registracija nije uspela"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Registration failed"})
                 return
             }
 
@@ -59,8 +59,8 @@ const Register = () => {
             setVerificationSuccess("")
             setIsVerificationOpen(true)
         } catch (error) {
-            console.error("Error registering klijent:", error.message)
-            setFieldErrors({form: "Registracija nije uspela"})
+            console.error("Error registering client:", error.message)
+            setFieldErrors({form: "Registration failed"})
         } finally {
             setIsRegistering(false)
         }
@@ -68,7 +68,7 @@ const Register = () => {
 
     const handleConfirmVerification = async (code) => {
         if (!pendingData) {
-            setVerificationError("Podaci za registraciju nedostaju")
+            setVerificationError("Registration data is missing")
             return
         }
 
@@ -77,11 +77,11 @@ const Register = () => {
         setVerificationSuccess("")
 
         try {
-            const response = await fetch(apiUrl("/api/klijenti/register/verify"), {
+            const response = await fetch(apiUrl("/api/clients/register/verify"), {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                    klijent: pendingData,
+                    client: pendingData,
                     email: pendingData.email,
                     code
                 })
@@ -90,15 +90,15 @@ const Register = () => {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
                 const errors = errorData?.fieldErrors ?? {}
-                setVerificationError(errors.code ?? errors.form ?? "Verifikacija nije uspela")
+                setVerificationError(errors.code ?? errors.form ?? "Verification failed")
                 return
             }
 
-            setVerificationSuccess("Email je uspešno verifikovan")
-            navigate("/login", {state: {successMessage: "Registracija je uspešno završena. Sada se možete prijaviti."}})
+            setVerificationSuccess("Email verified successfully")
+            navigate("/login", {state: {successMessage: "Registration complete. You can sign in now."}})
         } catch (error) {
-            console.error("Error verifying klijent email:", error.message)
-            setVerificationError("Verifikacija nije uspela")
+            console.error("Error verifying client email:", error.message)
+            setVerificationError("Verification failed")
         } finally {
             setIsVerificationLoading(false)
         }
@@ -107,25 +107,25 @@ const Register = () => {
     return (
         <main className="auth-shell">
             <div className="auth-card">
-                <h1>Registracija</h1>
-                <p className="auth-hint">Napravite klijentski nalog da biste mogli da iznajmljujete fotoaparate.</p>
+                <h1>Sign up</h1>
+                <p className="auth-hint">Create a client account so you can rent cameras.</p>
 
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="ime">Ime</label>
-                        <input id="ime" name="ime" type="text" value={formData.ime} onChange={handleChange}/>
-                        {fieldErrors.ime && <p className="field-error">{fieldErrors.ime}</p>}
+                        <label htmlFor="firstName">First name</label>
+                        <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleChange}/>
+                        {fieldErrors.firstName && <p className="field-error">{fieldErrors.firstName}</p>}
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="prezime">Prezime</label>
-                        <input id="prezime" name="prezime" type="text" value={formData.prezime} onChange={handleChange}/>
-                        {fieldErrors.prezime && <p className="field-error">{fieldErrors.prezime}</p>}
+                        <label htmlFor="lastName">Last name</label>
+                        <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleChange}/>
+                        {fieldErrors.lastName && <p className="field-error">{fieldErrors.lastName}</p>}
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="starost">Starost</label>
-                        <input id="starost" name="starost" type="number" min="0" value={formData.starost} onChange={handleChange}/>
+                        <label htmlFor="age">Age</label>
+                        <input id="age" name="age" type="number" min="0" value={formData.age} onChange={handleChange}/>
                     </div>
 
                     <div className="auth-field">
@@ -135,13 +135,13 @@ const Register = () => {
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="username">Korisničko ime</label>
+                        <label htmlFor="username">Username</label>
                         <input id="username" name="username" type="text" value={formData.username} onChange={handleChange}/>
                         {fieldErrors.username && <p className="field-error">{fieldErrors.username}</p>}
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="password">Lozinka</label>
+                        <label htmlFor="password">Password</label>
                         <input id="password" name="password" type="password" value={formData.password} onChange={handleChange}/>
                         {fieldErrors.password && <p className="field-error">{fieldErrors.password}</p>}
                     </div>
@@ -149,12 +149,12 @@ const Register = () => {
                     {fieldErrors.form && <p className="form-error">{fieldErrors.form}</p>}
 
                     <button type="submit" className="auth-submit" disabled={isRegistering}>
-                        {isRegistering ? "Slanje..." : "Registruj se"}
+                        {isRegistering ? "Sending..." : "Sign up"}
                     </button>
                 </form>
 
                 <p className="auth-switch-text">
-                    Već imate nalog? <a href="/login" onClick={(event) => { event.preventDefault(); navigate("/login") }}>Prijavite se</a>
+                    Already have an account? <a href="/login" onClick={(event) => { event.preventDefault(); navigate("/login") }}>Sign in</a>
                 </p>
             </div>
 

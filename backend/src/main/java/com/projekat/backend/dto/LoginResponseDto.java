@@ -2,8 +2,8 @@ package com.projekat.backend.dto;
 
 public class LoginResponseDto {
     private Long userId;
-    private String ime;
-    private String prezime;
+    private String firstName;
+    private String lastName;
     private String username;
     private String userType;
     private String token;
@@ -11,10 +11,10 @@ public class LoginResponseDto {
     public LoginResponseDto() {
     }
 
-    public LoginResponseDto(Long userId, String ime, String prezime, String username, String userType, String token) {
+    public LoginResponseDto(Long userId, String firstName, String lastName, String username, String userType, String token) {
         this.userId = userId;
-        this.ime = ime;
-        this.prezime = prezime;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.userType = userType;
         this.token = token;
@@ -28,20 +28,20 @@ public class LoginResponseDto {
         this.userId = userId;
     }
 
-    public String getIme() {
-        return ime;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setIme(String ime) {
-        this.ime = ime;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getPrezime() {
-        return prezime;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setPrezime(String prezime) {
-        this.prezime = prezime;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUsername() {

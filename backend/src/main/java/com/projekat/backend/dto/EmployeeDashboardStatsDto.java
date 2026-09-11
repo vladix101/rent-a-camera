@@ -3,82 +3,82 @@ package com.projekat.backend.dto;
 import java.util.List;
 
 public class EmployeeDashboardStatsDto {
-    private Long ukupanBrojIznajmljivanja;
-    private Long ukupanBrojKlijenata;
-    private Long ukupanBrojFotoaparata;
-    private Long brojDostupnihFotoaparata;
-    private Long brojNedostupnihFotoaparata;
-    private String najpopularnijiFotoaparat;
-    private List<RentalStatsDto> statistikaPoFotoaparatu;
+    private Long totalRentals;
+    private Long totalClients;
+    private Long totalCameras;
+    private Long availableCameras;
+    private Long unavailableCameras;
+    private String mostPopularCamera;
+    private List<RentalStatsDto> statsPerCamera;
 
     public EmployeeDashboardStatsDto() {
     }
 
-    public EmployeeDashboardStatsDto(Long ukupanBrojIznajmljivanja, Long ukupanBrojKlijenata, Long ukupanBrojFotoaparata,
-                                      Long brojDostupnihFotoaparata, Long brojNedostupnihFotoaparata,
-                                      String najpopularnijiFotoaparat, List<RentalStatsDto> statistikaPoFotoaparatu) {
-        this.ukupanBrojIznajmljivanja = ukupanBrojIznajmljivanja;
-        this.ukupanBrojKlijenata = ukupanBrojKlijenata;
-        this.ukupanBrojFotoaparata = ukupanBrojFotoaparata;
-        this.brojDostupnihFotoaparata = brojDostupnihFotoaparata;
-        this.brojNedostupnihFotoaparata = brojNedostupnihFotoaparata;
-        this.najpopularnijiFotoaparat = najpopularnijiFotoaparat;
-        this.statistikaPoFotoaparatu = statistikaPoFotoaparatu;
+    public EmployeeDashboardStatsDto(Long totalRentals, Long totalClients, Long totalCameras,
+                                      Long availableCameras, Long unavailableCameras,
+                                      String mostPopularCamera, List<RentalStatsDto> statsPerCamera) {
+        this.totalRentals = totalRentals;
+        this.totalClients = totalClients;
+        this.totalCameras = totalCameras;
+        this.availableCameras = availableCameras;
+        this.unavailableCameras = unavailableCameras;
+        this.mostPopularCamera = mostPopularCamera;
+        this.statsPerCamera = statsPerCamera;
     }
 
-    public Long getUkupanBrojIznajmljivanja() {
-        return ukupanBrojIznajmljivanja;
+    public Long getTotalRentals() {
+        return totalRentals;
     }
 
-    public void setUkupanBrojIznajmljivanja(Long ukupanBrojIznajmljivanja) {
-        this.ukupanBrojIznajmljivanja = ukupanBrojIznajmljivanja;
+    public void setTotalRentals(Long totalRentals) {
+        this.totalRentals = totalRentals;
     }
 
-    public Long getUkupanBrojKlijenata() {
-        return ukupanBrojKlijenata;
+    public Long getTotalClients() {
+        return totalClients;
     }
 
-    public void setUkupanBrojKlijenata(Long ukupanBrojKlijenata) {
-        this.ukupanBrojKlijenata = ukupanBrojKlijenata;
+    public void setTotalClients(Long totalClients) {
+        this.totalClients = totalClients;
     }
 
-    public Long getUkupanBrojFotoaparata() {
-        return ukupanBrojFotoaparata;
+    public Long getTotalCameras() {
+        return totalCameras;
     }
 
-    public void setUkupanBrojFotoaparata(Long ukupanBrojFotoaparata) {
-        this.ukupanBrojFotoaparata = ukupanBrojFotoaparata;
+    public void setTotalCameras(Long totalCameras) {
+        this.totalCameras = totalCameras;
     }
 
-    public Long getBrojDostupnihFotoaparata() {
-        return brojDostupnihFotoaparata;
+    public Long getAvailableCameras() {
+        return availableCameras;
     }
 
-    public void setBrojDostupnihFotoaparata(Long brojDostupnihFotoaparata) {
-        this.brojDostupnihFotoaparata = brojDostupnihFotoaparata;
+    public void setAvailableCameras(Long availableCameras) {
+        this.availableCameras = availableCameras;
     }
 
-    public Long getBrojNedostupnihFotoaparata() {
-        return brojNedostupnihFotoaparata;
+    public Long getUnavailableCameras() {
+        return unavailableCameras;
     }
 
-    public void setBrojNedostupnihFotoaparata(Long brojNedostupnihFotoaparata) {
-        this.brojNedostupnihFotoaparata = brojNedostupnihFotoaparata;
+    public void setUnavailableCameras(Long unavailableCameras) {
+        this.unavailableCameras = unavailableCameras;
     }
 
-    public String getNajpopularnijiFotoaparat() {
-        return najpopularnijiFotoaparat;
+    public String getMostPopularCamera() {
+        return mostPopularCamera;
     }
 
-    public void setNajpopularnijiFotoaparat(String najpopularnijiFotoaparat) {
-        this.najpopularnijiFotoaparat = najpopularnijiFotoaparat;
+    public void setMostPopularCamera(String mostPopularCamera) {
+        this.mostPopularCamera = mostPopularCamera;
     }
 
-    public List<RentalStatsDto> getStatistikaPoFotoaparatu() {
-        return statistikaPoFotoaparatu;
+    public List<RentalStatsDto> getStatsPerCamera() {
+        return statsPerCamera;
     }
 
-    public void setStatistikaPoFotoaparatu(List<RentalStatsDto> statistikaPoFotoaparatu) {
-        this.statistikaPoFotoaparatu = statistikaPoFotoaparatu;
+    public void setStatsPerCamera(List<RentalStatsDto> statsPerCamera) {
+        this.statsPerCamera = statsPerCamera;
     }
 }

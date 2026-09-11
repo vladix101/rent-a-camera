@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        The domain model was translated from Serbian to English, so Hibernate now maps to
+        English tables (camera, rental, client, ...) instead of the original Serbian ones
+        (fotoaparat, iznajmljivanje, klijent, ...).
+
+        Hibernate creates the new empty English tables before Liquibase runs (see LiquibaseConfig,
+        which depends on the entityManagerFactory). This changelog therefore copies the rows across
+        and drops the legacy tables, rather than renaming them.
+
+        Changesets 001-004 are left untouched so their checksums stay valid on existing databases.
+    -->
+
+    <changeSet id="005-copy-legacy-serbian-data" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="fotoaparat"/>
+            <tableExists tableName="camera"/>
+        </preConditions>
+        <sql splitStatements="true" stripComments="true">
+            INSERT IGNORE INTO category (id, name) SELECT id, naziv FROM kategorija;
+
+            INSERT IGNORE INTO manufacturer (id, name) SELECT id, name FROM proizvodjac;
+
+            INSERT IGNORE INTO specification (id, resolution, image_sensor, wifi, screen, power, image_size, description)
+                SELECT id, rezolucija, senzor_slike, wifi, ekran, napajanje, velicina_slike, opis FROM specifikacija;
+
+            INSERT IGNORE INTO client (id, first_name, last_name, age, username, password, email)
+                SELECT id, ime, prezime, starost, username, password, email FROM klijent;
+
+            INSERT IGNORE INTO employee (id, first_name, last_name, username, password, email)
+                SELECT id, ime, prezime, username, password, email FROM zaposleni;
+
+            INSERT IGNORE INTO camera (id, purchase_date, note, available, category_id, manufacturer_id, specification_id)
+                SELECT id, datum_kupovine, napomena, dostupan, kategorija_id, proizvodjac_id, specifikacija_id FROM fotoaparat;
+
+            INSERT IGNORE INTO rental (id, start_date, end_date, price, note, camera_id, client_id, employee_id)
+                SELECT id, datum_pocetka, datum_kraja, cena, napomena, fotoaparat_id, klijent_id, zaposleni_id FROM iznajmljivanje;
+        </sql>
+    </changeSet>
+
+    <changeSet id="005-drop-legacy-serbian-tables" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="fotoaparat"/>
+        </preConditions>
+        <dropTable tableName="iznajmljivanje" cascadeConstraints="true"/>
+        <dropTable tableName="fotoaparat" cascadeConstraints="true"/>
+        <dropTable tableName="kategorija" cascadeConstraints="true"/>
+        <dropTable tableName="proizvodjac" cascadeConstraints="true"/>
+        <dropTable tableName="specifikacija" cascadeConstraints="true"/>
+        <dropTable tableName="klijent" cascadeConstraints="true"/>
+        <dropTable tableName="zaposleni" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!-- Translate the Serbian demo content that was carried over from the legacy tables. -->
+    <changeSet id="005-translate-migrated-content" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="category"/>
+        </preConditions>
+        <sql splitStatements="true" stripComments="true">
+            UPDATE category SET name = 'Compact' WHERE name = 'Kompaktni';
+            UPDATE category SET name = 'Action camera' WHERE name = 'Akciona kamera';
+            UPDATE category SET name = 'Video camera' WHERE name = 'Video kamera';
+
+            UPDATE camera SET note = 'Regularly serviced' WHERE note = 'Redovno servisiran';
+            UPDATE camera SET note = 'Excellent condition' WHERE note = 'Odlicno stanje';
+            UPDATE camera SET note = 'Compact and lightweight' WHERE note = 'Kompaktan i lagan';
+            UPDATE camera SET note = 'Minor scratches on the body' WHERE note = 'Ima sitne ogrebotine na kucistu';
+            UPDATE camera SET note = 'Nearly new, barely used' WHERE note = 'Novo, malo koriscen';
+            UPDATE camera SET note = 'Older model, currently out of service' WHERE note = 'Stariji model, trenutno van upotrebe';
+            UPDATE camera SET note = 'Professional model' WHERE note = 'Profesionalni model';
+            UPDATE camera SET note = 'Waterproof action camera' WHERE note = 'Vodootporna akciona kamera';
+            UPDATE camera SET note = 'Classic design' WHERE note = 'Klasican dizajn';
+            UPDATE camera SET note = 'Needs sensor cleaning, currently out of service' WHERE note = 'Zahteva ciscenje senzora, trenutno van upotrebe';
+
+            UPDATE rental SET note = 'Weekend rental' WHERE note = 'Vikend iznajmljivanje';
+            UPDATE rental SET note = 'Wedding rental' WHERE note = 'Iznajmljivanje za vencanje';
+            UPDATE rental SET note = 'Business trip' WHERE note = 'Poslovno putovanje';
+            UPDATE rental SET note = 'Birthday party' WHERE note = 'Rodjendanska proslava';
+            UPDATE rental SET note = 'Short trip' WHERE note = 'Kratak izlet';
+            UPDATE rental SET note = 'Commercial shoot' WHERE note = 'Snimanje reklame';
+            UPDATE rental SET note = 'Family trip' WHERE note = 'Porodicno putovanje';
+            UPDATE rental SET note = 'Conference rental' WHERE note = 'Iznajmljivanje za konferenciju';
+            UPDATE rental SET note = 'Summer festival' WHERE note = 'Letnji festival';
+            UPDATE rental SET note = 'One-day photo shoot' WHERE note = 'Jednodnevno fotografisanje';
+            UPDATE rental SET note = 'Winter photo shoot' WHERE note = 'Zimsko fotografisanje';
+            UPDATE rental SET note = 'Spring session' WHERE note = 'Prolecna sesija';
+            UPDATE rental SET note = 'Valentine photo shoot' WHERE note = 'Valentinovo fotografisanje';
+            UPDATE rental SET note = 'Spring outing' WHERE note = 'Prolecni izlet';
+
+            UPDATE specification SET power = 'Li-ion battery' WHERE power = 'Li-ion baterija';
+            UPDATE specification SET screen = '3.2" tilting LCD' WHERE screen = '3.2" nagibni LCD';
+            UPDATE specification SET screen = '3.0" tilting touchscreen' WHERE screen = '3.0" nagibni touchscreen';
+            UPDATE specification SET screen = 'No screen (viewfinder only)' WHERE screen = 'Bez ekrana (trazilo)';
+            UPDATE specification SET image_sensor = '1-inch sensor' WHERE image_sensor = '1-incni senzor';
+            UPDATE specification SET image_sensor = 'CMOS action camera' WHERE image_sensor = 'CMOS akciona kamera';
+            UPDATE specification SET description = 'DSLR camera ideal for beginners and enthusiasts.' WHERE description = 'DSLR fotoaparat idealan za pocetnike i entuzijaste.';
+            UPDATE specification SET description = 'Professional DSLR with excellent low-light performance.' WHERE description = 'Profesionalni DSLR sa odlicnim performansama pri slaboj svetlosti.';
+            UPDATE specification SET description = 'Compact mirrorless camera for everyday use.' WHERE description = 'Kompaktan bezogledalni fotoaparat za svakodnevnu upotrebu.';
+            UPDATE specification SET description = 'Retro design with modern performance.' WHERE description = 'Retro dizajn sa modernim performansama.';
+            UPDATE specification SET description = 'An excellent choice for video work.' WHERE description = 'Odlican izbor za video snimanje.';
+            UPDATE specification SET description = 'Compact mirrorless camera.' WHERE description = 'Kompaktan mirrorless fotoaparat.';
+            UPDATE specification SET description = 'Legendary build and optical quality.' WHERE description = 'Legendarni kvalitet izrade i optike.';
+            UPDATE specification SET description = 'Waterproof camera for extreme sports.' WHERE description = 'Vodootporna kamera za ekstremne sportove.';
+            UPDATE specification SET description = 'Rugged, weather-sealed DSLR.' WHERE description = 'Robustan DSLR otporan na vremenske uslove.';
+            UPDATE specification SET description = 'A unique sensor delivering exceptional colour sharpness.' WHERE description = 'Jedinstven senzor za izuzetnu ostrinu boja.';
+
+            UPDATE client SET first_name = 'Test', last_name = 'Client', username = 'client', password = 'client123', email = 'client@example.com' WHERE username = 'klijent';
+            UPDATE employee SET first_name = 'Test', last_name = 'Employee', username = 'employee', password = 'employee123' WHERE username = 'zaposleni';
+            UPDATE employee SET email = REPLACE(email, '@fotorent.com', '@rentacamera.com') WHERE email LIKE '%@fotorent.com';
+        </sql>
+    </changeSet>
+
+    <!-- Seed a fresh database (changesets 001-004 only ever seeded the legacy Serbian tables). -->
+    <changeSet id="005-seed-english-data" author="mina">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="camera"/>
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM camera</sqlCheck>
+        </preConditions>
+        <sql splitStatements="true" stripComments="true">
+            INSERT IGNORE INTO category (id, name) VALUES
+                (1, 'DSLR'),
+                (2, 'Mirrorless'),
+                (3, 'Compact'),
+                (4, 'Action camera'),
+                (5, 'Instant'),
+                (6, 'Video camera');
+
+            INSERT IGNORE INTO manufacturer (id, name) VALUES
+                (1, 'Canon'), (2, 'Nikon'), (3, 'Sony'), (4, 'Fujifilm'), (5, 'Panasonic'),
+                (6, 'Olympus'), (7, 'Leica'), (8, 'GoPro'), (9, 'Pentax'), (10, 'Sigma');
+
+            INSERT IGNORE INTO specification (id, resolution, image_sensor, wifi, screen, power, image_size, description) VALUES
+                (1, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion battery', '6000x4000', 'DSLR camera ideal for beginners and enthusiasts.'),
+                (2, '45MP', 'Full Frame CMOS', true, '3.2" tilting LCD', 'Li-ion battery', '8256x5504', 'Professional DSLR with excellent low-light performance.'),
+                (3, '20MP', '1-inch sensor', true, '3.0" touchscreen', 'Li-ion battery', '5472x3648', 'Compact mirrorless camera for everyday use.'),
+                (4, '26MP', 'X-Trans CMOS', true, '3.0" tilting touchscreen', 'Li-ion battery', '6240x4160', 'Retro design with modern performance.'),
+                (5, '20MP', 'Four Thirds CMOS', true, '3.0" vari-angle LCD', 'Li-ion battery', '5184x3888', 'An excellent choice for video work.'),
+                (6, '16MP', 'Four Thirds Live MOS', false, '3.0" LCD', 'Li-ion battery', '4608x3456', 'Compact mirrorless camera.'),
+                (7, '24MP', 'Full Frame CMOS', false, '3.0" LCD', 'Li-ion battery', '5952x3968', 'Legendary build and optical quality.'),
+                (8, '12MP', 'CMOS action camera', true, '2.0" touchscreen', 'Li-ion battery', '4000x3000', 'Waterproof camera for extreme sports.'),
+                (9, '24MP', 'APS-C CMOS', true, '3.0" LCD', 'Li-ion battery', '6000x4000', 'Rugged, weather-sealed DSLR.'),
+                (10, '14MP', 'Foveon X3 CMOS', false, 'No screen (viewfinder only)', 'Li-ion battery', '4704x3136', 'A unique sensor delivering exceptional colour sharpness.');
+
+            INSERT IGNORE INTO camera (id, purchase_date, note, available, category_id, manufacturer_id, specification_id) VALUES
+                (1, '2022-05-10', 'Regularly serviced', true, 1, 1, 1),
+                (2, '2021-11-03', 'Excellent condition', true, 1, 2, 2),
+                (3, '2023-01-15', 'Compact and lightweight', true, 3, 3, 3),
+                (4, '2020-08-22', 'Minor scratches on the body', true, 2, 4, 4),
+                (5, '2023-06-30', 'Nearly new, barely used', true, 6, 5, 5),
+                (6, '2019-03-12', 'Older model, currently out of service', false, 2, 6, 6),
+                (7, '2022-09-01', 'Professional model', true, 1, 7, 7),
+                (8, '2023-02-18', 'Waterproof action camera', true, 4, 8, 8),
+                (9, '2021-07-07', 'Classic design', true, 1, 9, 9),
+                (10, '2020-12-25', 'Needs sensor cleaning, currently out of service', false, 3, 10, 10);
+
+            INSERT IGNORE INTO client (id, first_name, last_name, age, username, password, email) VALUES
+                (1, 'Marko', 'Markovic', 25, 'marko', 'marko123', 'marko@example.com'),
+                (2, 'Jovana', 'Jovanovic', 30, 'jovana', 'jovana123', 'jovana@example.com'),
+                (3, 'Petar', 'Petrovic', 22, 'petar', 'petar123', 'petar@example.com'),
+                (4, 'Ana', 'Anic', 28, 'ana', 'ana123', 'ana@example.com'),
+                (5, 'Nikola', 'Nikolic', 35, 'nikola', 'nikola123', 'nikola@example.com'),
+                (6, 'Milica', 'Milic', 27, 'milica', 'milica123', 'milica@example.com'),
+                (7, 'Stefan', 'Stefanovic', 31, 'stefan', 'stefan123', 'stefan@example.com'),
+                (8, 'Ivana', 'Ivic', 24, 'ivana', 'ivana123', 'ivana@example.com'),
+                (9, 'Luka', 'Lukic', 29, 'luka', 'luka123', 'luka@example.com'),
+                (10, 'Test', 'Client', 26, 'client', 'client123', 'client@example.com');
+
+            INSERT IGNORE INTO employee (id, first_name, last_name, username, password, email) VALUES
+                (1, 'Jelena', 'Jelic', 'jelenaz', 'jelena123', 'jelenaz@rentacamera.com'),
+                (2, 'Nemanja', 'Simic', 'nemanja', 'nemanja123', 'nemanja@rentacamera.com'),
+                (3, 'Tamara', 'Tasic', 'tamara', 'tamara123', 'tamara@rentacamera.com'),
+                (4, 'Vladimir', 'Vukovic', 'vladimir', 'vladimir123', 'vladimir@rentacamera.com'),
+                (5, 'Sara', 'Savic', 'sara', 'sara123', 'sara@rentacamera.com'),
+                (6, 'Milos', 'Milosevic', 'milos', 'milos123', 'milos@rentacamera.com'),
+                (7, 'Katarina', 'Kostic', 'katarina', 'katarina123', 'katarina@rentacamera.com'),
+                (8, 'Nikola', 'Nesic', 'nikolaz', 'nikola123z', 'nikolaz@rentacamera.com'),
+                (9, 'Ognjen', 'Ognjanovic', 'ognjen', 'ognjen123', 'ognjen@rentacamera.com'),
+                (10, 'Test', 'Employee', 'employee', 'employee123', 'employee@rentacamera.com');
+
+            INSERT IGNORE INTO rental (id, start_date, end_date, price, note, camera_id, client_id, employee_id) VALUES
+                (1, '2026-07-01', '2026-07-04', 45.00, 'Weekend rental', 1, 1, 1),
+                (2, '2026-06-20', '2026-06-25', 60.00, 'Wedding rental', 2, 2, 2),
+                (3, '2026-07-02', '2026-07-05', 30.00, 'Business trip', 3, 3, 1),
+                (4, '2026-07-10', '2026-07-12', 40.00, 'Birthday party', 4, 4, 3),
+                (5, '2026-05-01', '2026-05-03', 25.00, 'Short trip', 5, 5, 4),
+                (6, '2026-07-15', '2026-07-20', 80.00, 'Commercial shoot', 7, 6, 5),
+                (7, '2026-06-01', '2026-06-05', 35.00, 'Family trip', 8, 7, 6),
+                (8, '2026-07-03', '2026-07-06', 50.00, 'Conference rental', 9, 8, 7),
+                (9, '2026-08-01', '2026-08-05', 55.00, 'Summer festival', 1, 9, 8),
+                (10, '2026-07-02', '2026-07-03', 20.00, 'One-day photo shoot', 5, 10, 9),
+                (11, '2025-01-10', '2025-01-13', 42.00, 'Winter photo shoot', 1, 3, 2),
+                (12, '2025-03-05', '2025-03-07', 33.00, 'Spring session', 1, 7, 3),
+                (13, '2025-02-14', '2025-02-16', 28.00, 'Valentine photo shoot', 6, 4, 1),
+                (14, '2025-04-20', '2025-04-22', 38.00, 'Spring outing', 10, 6, 4);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

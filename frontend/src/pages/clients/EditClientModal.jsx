@@ -1,13 +1,13 @@
 import {useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
 
-const EditClientModal = ({klijent, loggedInUser, onClose, onSaved}) => {
+const EditClientModal = ({client, loggedInUser, onClose, onSaved}) => {
     const [formData, setFormData] = useState({
-        ime: klijent.ime ?? "",
-        prezime: klijent.prezime ?? "",
-        starost: klijent.starost ?? "",
-        username: klijent.username ?? "",
-        email: klijent.email ?? ""
+        firstName: client.firstName ?? "",
+        lastName: client.lastName ?? "",
+        age: client.age ?? "",
+        username: client.username ?? "",
+        email: client.email ?? ""
     })
     const [fieldErrors, setFieldErrors] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -28,7 +28,7 @@ const EditClientModal = ({klijent, loggedInUser, onClose, onSaved}) => {
         setFieldErrors({})
 
         try {
-            const response = await fetch(apiUrl(`/api/klijenti/${klijent.id}`), {
+            const response = await fetch(apiUrl(`/api/clients/${client.id}`), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -36,20 +36,20 @@ const EditClientModal = ({klijent, loggedInUser, onClose, onSaved}) => {
                 },
                 body: JSON.stringify({
                     ...formData,
-                    starost: formData.starost === "" ? null : Number(formData.starost)
+                    age: formData.age === "" ? null : Number(formData.age)
                 })
             })
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Izmena klijenta nije uspela"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Failed to update the client"})
                 return
             }
 
             onSaved()
         } catch (error) {
-            console.error("Error updating klijent:", error.message)
-            setFieldErrors({form: "Izmena klijenta nije uspela"})
+            console.error("Error updating client:", error.message)
+            setFieldErrors({form: "Failed to update the client"})
         } finally {
             setIsSubmitting(false)
         }
@@ -64,28 +64,28 @@ const EditClientModal = ({klijent, loggedInUser, onClose, onSaved}) => {
                 aria-labelledby="edit-client-title"
                 onClick={(event) => event.stopPropagation()}
             >
-                <h2 id="edit-client-title">Izmeni klijenta</h2>
+                <h2 id="edit-client-title">Edit client</h2>
 
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="ime">Ime</label>
-                        <input id="ime" name="ime" type="text" value={formData.ime} onChange={handleChange}/>
-                        {fieldErrors.ime && <p className="field-error">{fieldErrors.ime}</p>}
+                        <label htmlFor="firstName">First name</label>
+                        <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleChange}/>
+                        {fieldErrors.firstName && <p className="field-error">{fieldErrors.firstName}</p>}
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="prezime">Prezime</label>
-                        <input id="prezime" name="prezime" type="text" value={formData.prezime} onChange={handleChange}/>
-                        {fieldErrors.prezime && <p className="field-error">{fieldErrors.prezime}</p>}
+                        <label htmlFor="lastName">Last name</label>
+                        <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleChange}/>
+                        {fieldErrors.lastName && <p className="field-error">{fieldErrors.lastName}</p>}
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="starost">Starost</label>
-                        <input id="starost" name="starost" type="number" min="0" value={formData.starost} onChange={handleChange}/>
+                        <label htmlFor="age">Age</label>
+                        <input id="age" name="age" type="number" min="0" value={formData.age} onChange={handleChange}/>
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="username">Korisničko ime</label>
+                        <label htmlFor="username">Username</label>
                         <input id="username" name="username" type="text" value={formData.username} onChange={handleChange}/>
                         {fieldErrors.username && <p className="field-error">{fieldErrors.username}</p>}
                     </div>
@@ -100,10 +100,10 @@ const EditClientModal = ({klijent, loggedInUser, onClose, onSaved}) => {
 
                     <div className="verification-actions">
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={isSubmitting}>
-                            Otkaži
+                            Cancel
                         </button>
                         <button type="submit" className="auth-submit" disabled={isSubmitting} style={{width: "auto", padding: "0 20px"}}>
-                            {isSubmitting ? "Čuvanje..." : "Sačuvaj izmene"}
+                            {isSubmitting ? "Saving..." : "Save changes"}
                         </button>
                     </div>
                 </form>

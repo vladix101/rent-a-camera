@@ -36,14 +36,14 @@ const Login = ({onLogin}) => {
         setIsSubmitting(true)
 
         try {
-            let response = await attemptLogin("/api/klijenti/login", formData)
+            let response = await attemptLogin("/api/clients/login", formData)
 
             if (!response.ok) {
-                response = await attemptLogin("/api/zaposleni/login", formData)
+                response = await attemptLogin("/api/employees/login", formData)
             }
 
             if (!response.ok) {
-                setError("Pogrešno korisničko ime ili lozinka")
+                setError("Incorrect username or password")
                 return
             }
 
@@ -52,7 +52,7 @@ const Login = ({onLogin}) => {
             navigate("/")
         } catch (error) {
             console.error("Error logging in:", error.message)
-            setError("Prijava nije uspela")
+            setError("Sign-in failed")
         } finally {
             setIsSubmitting(false)
         }
@@ -61,14 +61,14 @@ const Login = ({onLogin}) => {
     return (
         <main className="auth-shell">
             <div className="auth-card">
-                <h1>Prijava</h1>
-                <p className="auth-hint">Prijavi se kao klijent ili zaposleni.</p>
+                <h1>Sign in</h1>
+                <p className="auth-hint">Sign in as a client or an employee.</p>
 
                 {successMessage && <p className="verification-success">{successMessage}</p>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="username">Korisničko ime</label>
+                        <label htmlFor="username">Username</label>
                         <input
                             id="username"
                             type="text"
@@ -79,7 +79,7 @@ const Login = ({onLogin}) => {
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="password">Lozinka</label>
+                        <label htmlFor="password">Password</label>
                         <input
                             id="password"
                             type="password"
@@ -92,12 +92,12 @@ const Login = ({onLogin}) => {
                     {error && <p className="auth-error">{error}</p>}
 
                     <button type="submit" className="auth-submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Prijavljivanje..." : "Prijavi se"}
+                        {isSubmitting ? "Signing in..." : "Sign in"}
                     </button>
                 </form>
 
                 <p className="auth-switch-text">
-                    Nemate nalog? <a href="/register" onClick={(event) => { event.preventDefault(); navigate("/register") }}>Registruj se</a>
+                    Don't have an account? <a href="/register" onClick={(event) => { event.preventDefault(); navigate("/register") }}>Sign up</a>
                 </p>
 
                 

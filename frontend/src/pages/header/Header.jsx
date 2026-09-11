@@ -4,8 +4,8 @@ import "./Header.css"
 
 const Header = ({loggedInUser, onLogout}) => {
     const navigate = useNavigate()
-    const displayName = loggedInUser ? `${loggedInUser.ime ?? ""} ${loggedInUser.prezime ?? ""}`.trim() : ""
-    const roleLabel = loggedInUser?.userType === "ZAPOSLENI" ? "Zaposleni" : "Klijent"
+    const displayName = loggedInUser ? `${loggedInUser.firstName ?? ""} ${loggedInUser.lastName ?? ""}`.trim() : ""
+    const roleLabel = loggedInUser?.userType === "EMPLOYEE" ? "Employee" : "Client"
 
     const handleLogout = () => {
         onLogout()
@@ -22,49 +22,49 @@ const Header = ({loggedInUser, onLogout}) => {
                             <circle cx="12" cy="13" r="3.4" stroke="currentColor" strokeWidth="1.6"/>
                         </svg>
                     </span>
-                    FotoRent
+                    Rent-A-Camera
                 </Navbar.Brand>
 
                 <div className="ms-auto fr-nav-links">
                     {!loggedInUser && (
                         <Link className="fr-login-btn" to="/login">
-                            Prijava
+                            Sign in
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "KLIJENT" && (
-                        <Link className="fr-login-btn" to="/moja-iznajmljivanja">
-                            Moja iznajmljivanja
+                    {loggedInUser?.userType === "CLIENT" && (
+                        <Link className="fr-login-btn" to="/my-rentals">
+                            My rentals
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "ZAPOSLENI" && (
-                        <Link className="fr-login-btn" to="/dodaj-aparat">
-                            Dodaj aparat
+                    {loggedInUser?.userType === "EMPLOYEE" && (
+                        <Link className="fr-login-btn" to="/add-camera">
+                            Add camera
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "ZAPOSLENI" && (
-                        <Link className="fr-login-btn" to="/dodaj-kategoriju">
-                            Dodaj kategoriju
+                    {loggedInUser?.userType === "EMPLOYEE" && (
+                        <Link className="fr-login-btn" to="/add-category">
+                            Add category
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "ZAPOSLENI" && (
-                        <Link className="fr-login-btn" to="/dodaj-specifikaciju">
-                            Dodaj specifikaciju
+                    {loggedInUser?.userType === "EMPLOYEE" && (
+                        <Link className="fr-login-btn" to="/add-specification">
+                            Add specification
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "ZAPOSLENI" && (
-                        <Link className="fr-login-btn" to="/klijenti">
-                            Prikaz svih klijenata
+                    {loggedInUser?.userType === "EMPLOYEE" && (
+                        <Link className="fr-login-btn" to="/clients">
+                            All clients
                         </Link>
                     )}
 
-                    {loggedInUser?.userType === "ZAPOSLENI" && (
-                        <Link className="fr-login-btn" to="/statistika">
-                            Statistika
+                    {loggedInUser?.userType === "EMPLOYEE" && (
+                        <Link className="fr-login-btn" to="/statistics">
+                            Statistics
                         </Link>
                     )}
 
@@ -78,7 +78,7 @@ const Header = ({loggedInUser, onLogout}) => {
                                 <span className="fr-user-role">{roleLabel}</span>
                             </span>
                             <button type="button" className="fr-logout-btn" onClick={handleLogout}>
-                                Odjava
+                                Sign out
                             </button>
                         </div>
                     )}

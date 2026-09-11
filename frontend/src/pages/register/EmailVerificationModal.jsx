@@ -32,18 +32,18 @@ const EmailVerificationModal = ({email, isLoading, error, successMessage, onConf
     return (
         <div className="modal-backdrop" role="presentation">
             <section className="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verification-title">
-                <h2 id="verification-title">Verifikacija email adrese</h2>
+                <h2 id="verification-title">Email verification</h2>
                 <p className="verification-copy">
-                    Verifikacioni kod je poslat na <strong>{email}</strong>. Unesite 6-cifreni kod da biste završili registraciju.
+                    A verification code was sent to <strong>{email}</strong>. Enter the 6-digit code to complete your registration.
                 </p>
 
                 <div className={`verification-timer ${isExpired ? "timer-expired" : ""}`}>
-                    {isExpired ? "Kod je istekao" : `${minutes}:${seconds}`}
+                    {isExpired ? "Code expired" : `${minutes}:${seconds}`}
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="verificationCode">Verifikacioni kod</label>
+                        <label htmlFor="verificationCode">Verification code</label>
                         <input
                             id="verificationCode"
                             type="text"
@@ -60,7 +60,7 @@ const EmailVerificationModal = ({email, isLoading, error, successMessage, onConf
 
                     <div className="verification-actions">
                         <button type="button" className="btn-secondary" onClick={onCancel} disabled={isLoading}>
-                            Nazad
+                            Back
                         </button>
                         <button
                             type="submit"
@@ -68,7 +68,7 @@ const EmailVerificationModal = ({email, isLoading, error, successMessage, onConf
                             style={{width: "auto", padding: "0 20px"}}
                             disabled={isLoading || isExpired || code.length !== 6}
                         >
-                            Potvrdi
+                            Confirm
                         </button>
                     </div>
                 </form>

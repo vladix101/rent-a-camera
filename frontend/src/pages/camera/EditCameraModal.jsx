@@ -3,7 +3,7 @@ import {apiUrl} from "../../api/apiConfig.js"
 import CameraForm from "./CameraForm.jsx"
 import "./CameraForm.css"
 
-const EditCameraModal = ({fotoaparat, loggedInUser, onClose, onSaved}) => {
+const EditCameraModal = ({camera, loggedInUser, onClose, onSaved}) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [fieldErrors, setFieldErrors] = useState({})
 
@@ -12,7 +12,7 @@ const EditCameraModal = ({fotoaparat, loggedInUser, onClose, onSaved}) => {
         setFieldErrors({})
 
         try {
-            const response = await fetch(apiUrl(`/api/fotoaparati/${fotoaparat.id}`), {
+            const response = await fetch(apiUrl(`/api/cameras/${camera.id}`), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -23,14 +23,14 @@ const EditCameraModal = ({fotoaparat, loggedInUser, onClose, onSaved}) => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Izmena fotoaparata nije uspela"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Failed to update the camera"})
                 return
             }
 
             onSaved()
         } catch (error) {
-            console.error("Error updating fotoaparat:", error.message)
-            setFieldErrors({form: "Izmena fotoaparata nije uspela"})
+            console.error("Error updating camera:", error.message)
+            setFieldErrors({form: "Failed to update the camera"})
         } finally {
             setIsSubmitting(false)
         }
@@ -45,10 +45,10 @@ const EditCameraModal = ({fotoaparat, loggedInUser, onClose, onSaved}) => {
                 aria-labelledby="edit-camera-title"
                 onClick={(event) => event.stopPropagation()}
             >
-                <h2 id="edit-camera-title">Izmeni fotoaparat</h2>
+                <h2 id="edit-camera-title">Edit camera</h2>
                 <CameraForm
-                    fotoaparat={fotoaparat}
-                    submitLabel="Sačuvaj izmene"
+                    camera={camera}
+                    submitLabel="Save changes"
                     isSubmitting={isSubmitting}
                     fieldErrors={fieldErrors}
                     onSubmit={handleSubmit}

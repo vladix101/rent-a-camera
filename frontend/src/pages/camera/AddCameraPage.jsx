@@ -14,7 +14,7 @@ const AddCameraPage = ({loggedInUser}) => {
         setFieldErrors({})
 
         try {
-            const response = await fetch(apiUrl("/api/fotoaparati"), {
+            const response = await fetch(apiUrl("/api/cameras"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -25,14 +25,14 @@ const AddCameraPage = ({loggedInUser}) => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Dodavanje fotoaparata nije uspelo"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Failed to add the camera"})
                 return
             }
 
             navigate("/")
         } catch (error) {
-            console.error("Error creating fotoaparat:", error.message)
-            setFieldErrors({form: "Dodavanje fotoaparata nije uspelo"})
+            console.error("Error creating camera:", error.message)
+            setFieldErrors({form: "Failed to add the camera"})
         } finally {
             setIsSubmitting(false)
         }
@@ -40,13 +40,13 @@ const AddCameraPage = ({loggedInUser}) => {
 
     return (
         <main className="main-content camera-form-page">
-            <h1 className="page-title">Dodaj fotoaparat</h1>
-            <p className="page-subtitle">Unesite podatke o novom fotoaparatu koji ulazi u ponudu.</p>
+            <h1 className="page-title">Add camera</h1>
+            <p className="page-subtitle">Enter the details of the new camera being added to the fleet.</p>
 
             <div className="auth-card camera-form-card">
                 <CameraForm
-                    fotoaparat={null}
-                    submitLabel="Dodaj fotoaparat"
+                    camera={null}
+                    submitLabel="Add camera"
                     isSubmitting={isSubmitting}
                     fieldErrors={fieldErrors}
                     onSubmit={handleSubmit}

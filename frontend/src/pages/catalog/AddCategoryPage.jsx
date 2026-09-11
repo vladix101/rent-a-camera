@@ -5,7 +5,7 @@ import "../camera/CameraForm.css"
 
 const AddCategoryPage = ({loggedInUser}) => {
     const navigate = useNavigate()
-    const [naziv, setNaziv] = useState("")
+    const [name, setName] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [fieldErrors, setFieldErrors] = useState({})
     const [successMessage, setSuccessMessage] = useState("")
@@ -17,26 +17,26 @@ const AddCategoryPage = ({loggedInUser}) => {
         setSuccessMessage("")
 
         try {
-            const response = await fetch(apiUrl("/api/kategorije"), {
+            const response = await fetch(apiUrl("/api/categories"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${loggedInUser.token}`
                 },
-                body: JSON.stringify({naziv})
+                body: JSON.stringify({name})
             })
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Dodavanje kategorije nije uspelo"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Failed to add the category"})
                 return
             }
 
-            setNaziv("")
-            setSuccessMessage("Kategorija je uspešno dodata.")
+            setName("")
+            setSuccessMessage("Category added successfully.")
         } catch (error) {
-            console.error("Error creating kategorija:", error.message)
-            setFieldErrors({form: "Dodavanje kategorije nije uspelo"})
+            console.error("Error creating category:", error.message)
+            setFieldErrors({form: "Failed to add the category"})
         } finally {
             setIsSubmitting(false)
         }
@@ -44,22 +44,22 @@ const AddCategoryPage = ({loggedInUser}) => {
 
     return (
         <main className="main-content camera-form-page">
-            <h1 className="page-title">Dodaj kategoriju</h1>
-            <p className="page-subtitle">Unesite naziv nove kategorije fotoaparata.</p>
+            <h1 className="page-title">Add category</h1>
+            <p className="page-subtitle">Enter the name of a new camera category.</p>
 
             <div className="auth-card camera-form-card">
                 <form className="camera-form" onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="naziv">Naziv kategorije</label>
+                        <label htmlFor="name">Category name</label>
                         <input
-                            id="naziv"
-                            name="naziv"
+                            id="name"
+                            name="name"
                             type="text"
-                            placeholder="npr. DSLR"
-                            value={naziv}
-                            onChange={(event) => setNaziv(event.target.value)}
+                            placeholder="e.g. DSLR"
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
                         />
-                        {fieldErrors?.naziv && <p className="field-error">{fieldErrors.naziv}</p>}
+                        {fieldErrors?.name && <p className="field-error">{fieldErrors.name}</p>}
                     </div>
 
                     {successMessage && <p className="verification-success">{successMessage}</p>}
@@ -67,10 +67,10 @@ const AddCategoryPage = ({loggedInUser}) => {
 
                     <div className="verification-actions">
                         <button type="button" className="btn-secondary" onClick={() => navigate("/")} disabled={isSubmitting}>
-                            Nazad
+                            Back
                         </button>
                         <button type="submit" className="auth-submit" disabled={isSubmitting} style={{width: "auto", padding: "0 20px"}}>
-                            {isSubmitting ? "Čuvanje..." : "Dodaj kategoriju"}
+                            {isSubmitting ? "Saving..." : "Add category"}
                         </button>
                     </div>
                 </form>

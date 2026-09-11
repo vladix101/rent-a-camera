@@ -1,10 +1,10 @@
 import {useMemo, useState} from "react"
 
 const MONTH_NAMES = [
-    "Januar", "Februar", "Mart", "April", "Maj", "Jun",
-    "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
 ]
-const DAY_LABELS = ["Pon", "Uto", "Sre", "Čet", "Pet", "Sub", "Ned"]
+const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 const toIso = (date) => {
     const year = date.getFullYear()
@@ -19,14 +19,14 @@ const startOfDay = (date) => {
     return copy
 }
 
-const buildOccupiedSet = (zauzetost) => {
+const buildOccupiedSet = (occupancy) => {
     const occupied = new Set()
-    zauzetost.forEach(({datumOd, datumDo}) => {
-        if (!datumOd || !datumDo) {
+    occupancy.forEach(({dateFrom, dateTo}) => {
+        if (!dateFrom || !dateTo) {
             return
         }
-        let cursor = startOfDay(new Date(datumOd))
-        const end = startOfDay(new Date(datumDo))
+        let cursor = startOfDay(new Date(dateFrom))
+        const end = startOfDay(new Date(dateTo))
         while (cursor <= end) {
             occupied.add(toIso(cursor))
             cursor.setDate(cursor.getDate() + 1)
@@ -47,10 +47,10 @@ const rangeHasOccupiedDay = (occupiedSet, startIso, endIso) => {
     return false
 }
 
-const OccupancyCalendar = ({zauzetost, readOnly, selectedStart, selectedEnd, onSelect}) => {
+const OccupancyCalendar = ({occupancy, readOnly, selectedStart, selectedEnd, onSelect}) => {
     const [viewDate, setViewDate] = useState(() => startOfDay(new Date()))
     const today = useMemo(() => startOfDay(new Date()), [])
-    const occupiedSet = useMemo(() => buildOccupiedSet(zauzetost), [zauzetost])
+    const occupiedSet = useMemo(() => buildOccupiedSet(occupancy), [occupancy])
 
     const year = viewDate.getFullYear()
     const month = viewDate.getMonth()
@@ -131,9 +131,9 @@ const OccupancyCalendar = ({zauzetost, readOnly, selectedStart, selectedEnd, onS
     return (
         <div className="occupancy-calendar">
             <div className="occupancy-calendar-header">
-                <button type="button" onClick={handlePrevMonth} aria-label="Prethodni mesec">‹</button>
+                <button type="button" onClick={handlePrevMonth} aria-label="Previous month">‹</button>
                 <span>{MONTH_NAMES[month]} {year}</span>
-                <button type="button" onClick={handleNextMonth} aria-label="Sledeći mesec">›</button>
+                <button type="button" onClick={handleNextMonth} aria-label="Next month">›</button>
             </div>
 
             <div className="occupancy-calendar-weekdays">
@@ -155,9 +155,9 @@ const OccupancyCalendar = ({zauzetost, readOnly, selectedStart, selectedEnd, onS
             </div>
 
             <div className="occupancy-calendar-legend">
-                <span><i className="legend-dot legend-free"/> Slobodno</span>
-                <span><i className="legend-dot legend-occupied"/> Zauzeto</span>
-                {!readOnly && <span><i className="legend-dot legend-selected"/> Izabrano</span>}
+                <span><i className="legend-dot legend-free"/> Free</span>
+                <span><i className="legend-dot legend-occupied"/> Occupied</span>
+                {!readOnly && <span><i className="legend-dot legend-selected"/> Selected</span>}
             </div>
         </div>
     )

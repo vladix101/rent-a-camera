@@ -3,27 +3,27 @@ import {apiUrl} from "../../api/apiConfig.js"
 import {getCameraImage} from "../../utils/cameraImages.js"
 import "../home/Home.css"
 
-const formatDateSrb = (iso) => new Date(iso).toLocaleDateString("sr-Latn-RS")
+const formatDate = (iso) => new Date(iso).toLocaleDateString("en-GB")
 
 const MyRentals = ({loggedInUser}) => {
-    const [iznajmljivanja, setIznajmljivanja] = useState([])
+    const [rentals, setRentals] = useState([])
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchMyRentals = async () => {
             try {
-                const response = await fetch(apiUrl("/api/iznajmljivanja/moja"), {
+                const response = await fetch(apiUrl("/api/rentals/my"), {
                     headers: {"Authorization": `Bearer ${loggedInUser.token}`}
                 })
                 if (!response.ok) {
-                    setError("Iznajmljivanja ne mogu biti učitana")
+                    setError("Rentals could not be loaded")
                     return
                 }
-                setIznajmljivanja(await response.json())
+                setRentals(await response.json())
             } catch (error) {
-                console.error("Error fetching moja iznajmljivanja:", error.message)
-                setError("Iznajmljivanja ne mogu biti učitana")
+                console.error("Error fetching my rentals:", error.message)
+                setError("Rentals could not be loaded")
             } finally {
                 setLoading(false)
             }
@@ -34,31 +34,31 @@ const MyRentals = ({loggedInUser}) => {
 
     return (
         <main className="main-content">
-            <h1 className="page-title">Moja iznajmljivanja</h1>
-            <p className="page-subtitle">Pregled svih fotoaparata koje ste iznajmili.</p>
+            <h1 className="page-title">My rentals</h1>
+            <p className="page-subtitle">All the cameras you have rented.</p>
 
             {error && <p className="error-banner">{error}</p>}
 
-            {!error && !loading && iznajmljivanja.length === 0 && (
-                <p className="empty-state">Još uvek nemate iznajmljivanja.</p>
+            {!error && !loading && rentals.length === 0 && (
+                <p className="empty-state">You have no rentals yet.</p>
             )}
 
-            <section className="rental-grid" aria-label="Moja iznajmljivanja">
-                {iznajmljivanja.map((iznajmljivanje) => (
-                    <article className="rental-card" key={iznajmljivanje.id}>
+            <section className="rental-grid" aria-label="My rentals">
+                {rentals.map((rental) => (
+                    <article className="rental-card" key={rental.id}>
                         <div className="rental-card-art">
-                            <img src={getCameraImage(iznajmljivanje.kategorijaNaziv)} alt={iznajmljivanje.kategorijaNaziv || "Fotoaparat"}/>
+                            <img src={getCameraImage(rental.categoryName)} alt={rental.categoryName || "Camera"}/>
                         </div>
                         <div className="rental-card-body">
-                            <p className="manufacturer">{iznajmljivanje.kategorijaNaziv || "Fotoaparat"}</p>
+                            <p className="manufacturer">{rental.categoryName || "Camera"}</p>
                             <h2>
-                                {iznajmljivanje.rezolucija
-                                    ? `${iznajmljivanje.proizvodjacNaziv} · ${iznajmljivanje.rezolucija}`
-                                    : iznajmljivanje.proizvodjacNaziv}
+                                {rental.resolution
+                                    ? `${rental.manufacturerName} · ${rental.resolution}`
+                                    : rental.manufacturerName}
                             </h2>
-                            {iznajmljivanje.opis && <p className="camera-card-desc">{iznajmljivanje.opis}</p>}
+                            {rental.description && <p className="camera-card-desc">{rental.description}</p>}
                             <span className="rental-period">
-                                {formatDateSrb(iznajmljivanje.datumPocetka)} - {formatDateSrb(iznajmljivanje.datumKraja)}
+                                {formatDate(rental.startDate)} - {formatDate(rental.endDate)}
                             </span>
                         </div>
                     </article>

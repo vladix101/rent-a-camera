@@ -14,19 +14,19 @@ const tomorrowIso = () => {
 }
 
 const Home = ({loggedInUser}) => {
-    const [datumOd, setDatumOd] = useState(todayIso)
-    const [datumDo, setDatumDo] = useState(tomorrowIso)
-    const [fotoaparati, setFotoaparati] = useState([])
+    const [dateFrom, setDateFrom] = useState(todayIso)
+    const [dateTo, setDateTo] = useState(tomorrowIso)
+    const [cameras, setCameras] = useState([])
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(true)
-    const [selectedFotoaparat, setSelectedFotoaparat] = useState(null)
+    const [selectedCamera, setSelectedCamera] = useState(null)
     const [bookingMessage, setBookingMessage] = useState("")
     const [refreshToken, setRefreshToken] = useState(0)
     const [searchTerm, setSearchTerm] = useState("")
-    const [editingFotoaparat, setEditingFotoaparat] = useState(null)
+    const [editingCamera, setEditingCamera] = useState(null)
 
-    const isZaposleni = loggedInUser?.userType === "ZAPOSLENI"
-    const rangeInvalid = datumOd && datumDo && datumDo <= datumOd
+    const isEmployee = loggedInUser?.userType === "EMPLOYEE"
+    const rangeInvalid = dateFrom && dateTo && dateTo <= dateFrom
 
     useEffect(() => {
         if (rangeInvalid) {
@@ -35,142 +35,142 @@ const Home = ({loggedInUser}) => {
 
         let cancelled = false
 
-        const fetchFotoaparati = async () => {
+        const fetchCameras = async () => {
             setLoading(true)
             setError("")
             try {
-                const response = await fetch(apiUrl(`/api/fotoaparati?datumOd=${datumOd}&datumDo=${datumDo}`))
+                const response = await fetch(apiUrl(`/api/cameras?dateFrom=${dateFrom}&dateTo=${dateTo}`))
                 if (!response.ok) {
-                    if (!cancelled) setError("Fotoaparati ne mogu biti učitani")
+                    if (!cancelled) setError("Cameras could not be loaded")
                     return
                 }
                 const data = await response.json()
-                if (!cancelled) setFotoaparati(data)
+                if (!cancelled) setCameras(data)
             } catch (error) {
-                console.error("Error fetching fotoaparati:", error.message)
-                if (!cancelled) setError("Fotoaparati ne mogu biti učitani")
+                console.error("Error fetching cameras:", error.message)
+                if (!cancelled) setError("Cameras could not be loaded")
             } finally {
                 if (!cancelled) setLoading(false)
             }
         }
 
-        void fetchFotoaparati()
+        void fetchCameras()
         return () => {
             cancelled = true
         }
-    }, [datumOd, datumDo, rangeInvalid, refreshToken])
+    }, [dateFrom, dateTo, rangeInvalid, refreshToken])
 
-    const handleDatumOdChange = (event) => {
+    const handleDateFromChange = (event) => {
         const value = event.target.value
-        setDatumOd(value)
-        if (datumDo && value && datumDo <= value) {
+        setDateFrom(value)
+        if (dateTo && value && dateTo <= value) {
             const next = new Date(value)
             next.setDate(next.getDate() + 1)
-            setDatumDo(next.toISOString().slice(0, 10))
+            setDateTo(next.toISOString().slice(0, 10))
         }
     }
 
-    const brojNoci = (() => {
-        if (rangeInvalid || !datumOd || !datumDo) {
+    const nightCount = (() => {
+        if (rangeInvalid || !dateFrom || !dateTo) {
             return null
         }
-        const diff = (new Date(datumDo) - new Date(datumOd)) / (1000 * 60 * 60 * 24)
+        const diff = (new Date(dateTo) - new Date(dateFrom)) / (1000 * 60 * 60 * 24)
         return Math.round(diff)
     })()
 
     const handleBookingComplete = () => {
-        setSelectedFotoaparat(null)
-        setBookingMessage("Iznajmljivanje je uspešno potvrđeno! Proverite email za PDF potvrdu.")
+        setSelectedCamera(null)
+        setBookingMessage("Your rental is confirmed! Check your email for the PDF confirmation.")
         setRefreshToken((token) => token + 1)
         window.setTimeout(() => setBookingMessage(""), 6000)
     }
 
-    const filteredFotoaparati = useMemo(() => {
+    const filteredCameras = useMemo(() => {
         const term = searchTerm.trim().toLowerCase()
         if (!term) {
-            return fotoaparati
+            return cameras
         }
-        return fotoaparati.filter((fotoaparat) => {
+        return cameras.filter((camera) => {
             const haystack = [
-                fotoaparat.proizvodjac?.name,
-                fotoaparat.kategorija?.naziv,
-                fotoaparat.specifikacija?.rezolucija,
-                fotoaparat.specifikacija?.opis
+                camera.manufacturer?.name,
+                camera.category?.name,
+                camera.specification?.resolution,
+                camera.specification?.description
             ].filter(Boolean).join(" ").toLowerCase()
             return haystack.includes(term)
         })
-    }, [fotoaparati, searchTerm])
+    }, [cameras, searchTerm])
 
     const handleEditSaved = () => {
-        setEditingFotoaparat(null)
+        setEditingCamera(null)
         setRefreshToken((token) => token + 1)
     }
 
-    const handleDelete = async (event, fotoaparat) => {
+    const handleDelete = async (event, camera) => {
         event.stopPropagation()
-        const displayName = `${fotoaparat.proizvodjac?.name ?? ""} ${fotoaparat.specifikacija?.rezolucija ?? ""}`.trim()
-        if (!window.confirm(`Da li ste sigurni da želite da obrišete fotoaparat "${displayName}"?`)) {
+        const displayName = `${camera.manufacturer?.name ?? ""} ${camera.specification?.resolution ?? ""}`.trim()
+        if (!window.confirm(`Are you sure you want to delete camera "${displayName}"?`)) {
             return
         }
 
         try {
-            const response = await fetch(apiUrl(`/api/fotoaparati/${fotoaparat.id}`), {
+            const response = await fetch(apiUrl(`/api/cameras/${camera.id}`), {
                 method: "DELETE",
                 headers: {"Authorization": `Bearer ${loggedInUser.token}`}
             })
             if (!response.ok) {
-                setError("Brisanje fotoaparata nije uspelo")
+                setError("Failed to delete the camera")
                 return
             }
             setRefreshToken((token) => token + 1)
         } catch (error) {
-            console.error("Error deleting fotoaparat:", error.message)
-            setError("Brisanje fotoaparata nije uspelo")
+            console.error("Error deleting camera:", error.message)
+            setError("Failed to delete the camera")
         }
     }
 
     return (
         <main className="main-content">
-            <h1 className="page-title">Ponuda fotoaparata</h1>
-            <p className="page-subtitle">Pronađi i rezerviši opremu za svoj sledeći kadar.</p>
+            <h1 className="page-title">Camera fleet</h1>
+            <p className="page-subtitle">Find and book the gear for your next shot.</p>
 
-            <section className="filter-bar" aria-label="Filter perioda iznajmljivanja">
+            <section className="filter-bar" aria-label="Rental period filter">
                 <div className="filter-field">
-                    <label htmlFor="datumOd">Datum početka</label>
+                    <label htmlFor="dateFrom">Start date</label>
                     <input
-                        id="datumOd"
+                        id="dateFrom"
                         type="date"
-                        value={datumOd}
-                        onChange={handleDatumOdChange}
+                        value={dateFrom}
+                        onChange={handleDateFromChange}
                     />
                 </div>
                 <div className="filter-field">
-                    <label htmlFor="datumDo">Datum završetka</label>
+                    <label htmlFor="dateTo">End date</label>
                     <input
-                        id="datumDo"
+                        id="dateTo"
                         type="date"
-                        min={datumOd}
-                        value={datumDo}
-                        onChange={(event) => setDatumDo(event.target.value)}
+                        min={dateFrom}
+                        value={dateTo}
+                        onChange={(event) => setDateTo(event.target.value)}
                     />
                 </div>
 
                 {rangeInvalid ? (
-                    <p className="filter-error">Datum završetka mora biti posle datuma početka.</p>
+                    <p className="filter-error">End date must be after the start date.</p>
                 ) : (
-                    brojNoci !== null && (
+                    nightCount !== null && (
                         <span className="filter-summary">
-                            {brojNoci} {brojNoci === 1 ? "dan" : "dana"} iznajmljivanja
+                            {nightCount} {nightCount === 1 ? "day" : "days"} of rental
                         </span>
                     )
                 )}
             </section>
 
-            <section className="search-bar" aria-label="Pretraga fotoaparata">
+            <section className="search-bar" aria-label="Camera search">
                 <input
                     type="search"
                     className="search-input"
-                    placeholder="Pretraži po nazivu, proizvođaču ili kategoriji..."
+                    placeholder="Search by name, manufacturer or category..."
                     value={searchTerm}
                     onChange={(event) => setSearchTerm(event.target.value)}
                 />
@@ -179,87 +179,87 @@ const Home = ({loggedInUser}) => {
             {bookingMessage && <p className="verification-success">{bookingMessage}</p>}
             {error && <p className="error-banner">{error}</p>}
 
-            {!error && !loading && filteredFotoaparati.length === 0 && (
+            {!error && !loading && filteredCameras.length === 0 && (
                 <p className="empty-state">
-                    {fotoaparati.length === 0 ? "Trenutno nema fotoaparata u ponudi." : "Nema fotoaparata koji odgovaraju pretrazi."}
+                    {cameras.length === 0 ? "There are no cameras in the fleet yet." : "No cameras match your search."}
                 </p>
             )}
 
-            <section className="camera-grid" aria-label="Lista fotoaparata">
-                {filteredFotoaparati.map((fotoaparat) => (
+            <section className="camera-grid" aria-label="Camera list">
+                {filteredCameras.map((camera) => (
                     <article
                         className="camera-card"
-                        key={fotoaparat.id}
-                        onClick={() => setSelectedFotoaparat(fotoaparat)}
+                        key={camera.id}
+                        onClick={() => setSelectedCamera(camera)}
                     >
                         <div className="camera-card-art">
-                            <img src={getCameraImage(fotoaparat.kategorija?.naziv)} alt={fotoaparat.kategorija?.naziv || "Fotoaparat"}/>
-                            {fotoaparat.kategorija?.naziv && (
-                                <span className="camera-card-category">{fotoaparat.kategorija.naziv}</span>
+                            <img src={getCameraImage(camera.category?.name)} alt={camera.category?.name || "Camera"}/>
+                            {camera.category?.name && (
+                                <span className="camera-card-category">{camera.category.name}</span>
                             )}
-                            <span className={`camera-card-badge ${fotoaparat.dostupanZaPeriod ? "available" : "unavailable"}`}>
-                                {fotoaparat.dostupanZaPeriod ? "Dostupan" : "Nije dostupan"}
+                            <span className={`camera-card-badge ${camera.availableForPeriod ? "available" : "unavailable"}`}>
+                                {camera.availableForPeriod ? "Available" : "Unavailable"}
                             </span>
                         </div>
 
                         <div className="camera-card-body">
-                            <p className="manufacturer">{fotoaparat.proizvodjac?.name || "Nepoznat proizvođač"}</p>
-                            <h2>{fotoaparat.specifikacija?.rezolucija ? `${fotoaparat.proizvodjac?.name} · ${fotoaparat.specifikacija.rezolucija}` : fotoaparat.proizvodjac?.name}</h2>
+                            <p className="manufacturer">{camera.manufacturer?.name || "Unknown manufacturer"}</p>
+                            <h2>{camera.specification?.resolution ? `${camera.manufacturer?.name} · ${camera.specification.resolution}` : camera.manufacturer?.name}</h2>
 
-                            {fotoaparat.specifikacija?.opis && <p className="camera-card-desc">{fotoaparat.specifikacija.opis}</p>}
+                            {camera.specification?.description && <p className="camera-card-desc">{camera.specification.description}</p>}
 
                             <div className="camera-spec-list">
-                                {fotoaparat.specifikacija?.senzorSlike && (
+                                {camera.specification?.imageSensor && (
                                     <div>
-                                        <span>Senzor</span>
-                                        <strong>{fotoaparat.specifikacija.senzorSlike}</strong>
+                                        <span>Sensor</span>
+                                        <strong>{camera.specification.imageSensor}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.specifikacija?.ekran && (
+                                {camera.specification?.screen && (
                                     <div>
-                                        <span>Ekran</span>
-                                        <strong>{fotoaparat.specifikacija.ekran}</strong>
+                                        <span>Screen</span>
+                                        <strong>{camera.specification.screen}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.specifikacija?.velicinaSlike && (
+                                {camera.specification?.imageSize && (
                                     <div>
-                                        <span>Rezolucija slike</span>
-                                        <strong>{fotoaparat.specifikacija.velicinaSlike}</strong>
+                                        <span>Image resolution</span>
+                                        <strong>{camera.specification.imageSize}</strong>
                                     </div>
                                 )}
-                                {fotoaparat.specifikacija?.napajanje && (
+                                {camera.specification?.power && (
                                     <div>
-                                        <span>Napajanje</span>
-                                        <strong>{fotoaparat.specifikacija.napajanje}</strong>
+                                        <span>Power</span>
+                                        <strong>{camera.specification.power}</strong>
                                     </div>
                                 )}
                             </div>
 
                             <div className="camera-card-footer">
-                                {fotoaparat.specifikacija?.wifi ? (
+                                {camera.specification?.wifi ? (
                                     <span className="wifi-chip">Wi-Fi</span>
                                 ) : <span/>}
-                                {fotoaparat.napomena && <span className="note-text">{fotoaparat.napomena}</span>}
+                                {camera.note && <span className="note-text">{camera.note}</span>}
                             </div>
 
-                            {isZaposleni && (
+                            {isEmployee && (
                                 <div className="camera-card-manage">
                                     <button
                                         type="button"
                                         className="camera-card-edit-btn"
                                         onClick={(event) => {
                                             event.stopPropagation()
-                                            setEditingFotoaparat(fotoaparat)
+                                            setEditingCamera(camera)
                                         }}
                                     >
-                                        Izmeni
+                                        Edit
                                     </button>
                                     <button
                                         type="button"
                                         className="camera-card-delete-btn"
-                                        onClick={(event) => handleDelete(event, fotoaparat)}
+                                        onClick={(event) => handleDelete(event, camera)}
                                     >
-                                        Obriši
+                                        Delete
                                     </button>
                                 </div>
                             )}
@@ -268,20 +268,20 @@ const Home = ({loggedInUser}) => {
                 ))}
             </section>
 
-            {selectedFotoaparat && (
+            {selectedCamera && (
                 <CameraModal
-                    fotoaparat={selectedFotoaparat}
+                    camera={selectedCamera}
                     loggedInUser={loggedInUser}
-                    onClose={() => setSelectedFotoaparat(null)}
+                    onClose={() => setSelectedCamera(null)}
                     onBookingComplete={handleBookingComplete}
                 />
             )}
 
-            {editingFotoaparat && (
+            {editingCamera && (
                 <EditCameraModal
-                    fotoaparat={editingFotoaparat}
+                    camera={editingCamera}
                     loggedInUser={loggedInUser}
-                    onClose={() => setEditingFotoaparat(null)}
+                    onClose={() => setEditingCamera(null)}
                     onSaved={handleEditSaved}
                 />
             )}

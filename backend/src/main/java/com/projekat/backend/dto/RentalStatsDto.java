@@ -1,40 +1,40 @@
 package com.projekat.backend.dto;
 
 public class RentalStatsDto {
-    private String nazivFotoaparata;
-    private Long brojIznajmljivanja;
-    private Double procenat;
+    private String cameraName;
+    private Long rentalCount;
+    private Double percentage;
 
     public RentalStatsDto() {
     }
 
-    public RentalStatsDto(String nazivFotoaparata, Long brojIznajmljivanja, Double procenat) {
-        this.nazivFotoaparata = nazivFotoaparata;
-        this.brojIznajmljivanja = brojIznajmljivanja;
-        this.procenat = procenat;
+    public RentalStatsDto(String cameraName, Long rentalCount, Double percentage) {
+        this.cameraName = cameraName;
+        this.rentalCount = rentalCount;
+        this.percentage = percentage;
     }
 
-    public String getNazivFotoaparata() {
-        return nazivFotoaparata;
+    public String getCameraName() {
+        return cameraName;
     }
 
-    public void setNazivFotoaparata(String nazivFotoaparata) {
-        this.nazivFotoaparata = nazivFotoaparata;
+    public void setCameraName(String cameraName) {
+        this.cameraName = cameraName;
     }
 
-    public Long getBrojIznajmljivanja() {
-        return brojIznajmljivanja;
+    public Long getRentalCount() {
+        return rentalCount;
     }
 
-    public void setBrojIznajmljivanja(Long brojIznajmljivanja) {
-        this.brojIznajmljivanja = brojIznajmljivanja;
+    public void setRentalCount(Long rentalCount) {
+        this.rentalCount = rentalCount;
     }
 
-    public Double getProcenat() {
-        return procenat;
+    public Double getPercentage() {
+        return percentage;
     }
 
-    public void setProcenat(Double procenat) {
-        this.procenat = procenat;
+    public void setPercentage(Double percentage) {
+        this.percentage = percentage;
     }
 }

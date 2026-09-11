@@ -4,13 +4,13 @@ import {apiUrl} from "../../api/apiConfig.js"
 import "../camera/CameraForm.css"
 
 const emptyForm = {
-    rezolucija: "",
-    senzorSlike: "",
+    resolution: "",
+    imageSensor: "",
     wifi: false,
-    ekran: "",
-    napajanje: "",
-    velicinaSlike: "",
-    opis: ""
+    screen: "",
+    power: "",
+    imageSize: "",
+    description: ""
 }
 
 const AddSpecificationPage = ({loggedInUser}) => {
@@ -32,7 +32,7 @@ const AddSpecificationPage = ({loggedInUser}) => {
         setSuccessMessage("")
 
         try {
-            const response = await fetch(apiUrl("/api/specifikacije"), {
+            const response = await fetch(apiUrl("/api/specifications"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -43,15 +43,15 @@ const AddSpecificationPage = ({loggedInUser}) => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Dodavanje specifikacije nije uspelo"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Failed to add the specification"})
                 return
             }
 
             setFormData(emptyForm)
-            setSuccessMessage("Specifikacija je uspešno dodata.")
+            setSuccessMessage("Specification added successfully.")
         } catch (error) {
-            console.error("Error creating specifikacija:", error.message)
-            setFieldErrors({form: "Dodavanje specifikacije nije uspelo"})
+            console.error("Error creating specification:", error.message)
+            setFieldErrors({form: "Failed to add the specification"})
         } finally {
             setIsSubmitting(false)
         }
@@ -59,43 +59,43 @@ const AddSpecificationPage = ({loggedInUser}) => {
 
     return (
         <main className="main-content camera-form-page">
-            <h1 className="page-title">Dodaj specifikaciju</h1>
-            <p className="page-subtitle">Unesite tehničke specifikacije koje se mogu dodeliti fotoaparatu.</p>
+            <h1 className="page-title">Add specification</h1>
+            <p className="page-subtitle">Enter the technical specification that can be assigned to a camera.</p>
 
             <div className="auth-card camera-form-card">
                 <form className="camera-form" onSubmit={handleSubmit}>
                     <div className="camera-form-grid">
                         <div className="auth-field">
-                            <label htmlFor="rezolucija">Rezolucija</label>
-                            <input id="rezolucija" name="rezolucija" type="text" placeholder="npr. 24MP" value={formData.rezolucija} onChange={handleChange}/>
-                            {fieldErrors?.rezolucija && <p className="field-error">{fieldErrors.rezolucija}</p>}
+                            <label htmlFor="resolution">Resolution</label>
+                            <input id="resolution" name="resolution" type="text" placeholder="e.g. 24MP" value={formData.resolution} onChange={handleChange}/>
+                            {fieldErrors?.resolution && <p className="field-error">{fieldErrors.resolution}</p>}
                         </div>
 
                         <div className="auth-field">
-                            <label htmlFor="senzorSlike">Senzor slike</label>
-                            <input id="senzorSlike" name="senzorSlike" type="text" placeholder="npr. APS-C CMOS" value={formData.senzorSlike} onChange={handleChange}/>
-                            {fieldErrors?.senzorSlike && <p className="field-error">{fieldErrors.senzorSlike}</p>}
+                            <label htmlFor="imageSensor">Image sensor</label>
+                            <input id="imageSensor" name="imageSensor" type="text" placeholder="e.g. APS-C CMOS" value={formData.imageSensor} onChange={handleChange}/>
+                            {fieldErrors?.imageSensor && <p className="field-error">{fieldErrors.imageSensor}</p>}
                         </div>
 
                         <div className="auth-field">
-                            <label htmlFor="ekran">Ekran</label>
-                            <input id="ekran" name="ekran" type="text" placeholder='npr. 3.0" LCD' value={formData.ekran} onChange={handleChange}/>
+                            <label htmlFor="screen">Screen</label>
+                            <input id="screen" name="screen" type="text" placeholder='e.g. 3.0" LCD' value={formData.screen} onChange={handleChange}/>
                         </div>
 
                         <div className="auth-field">
-                            <label htmlFor="napajanje">Napajanje</label>
-                            <input id="napajanje" name="napajanje" type="text" placeholder="npr. Li-ion baterija" value={formData.napajanje} onChange={handleChange}/>
+                            <label htmlFor="power">Power</label>
+                            <input id="power" name="power" type="text" placeholder="e.g. Li-ion battery" value={formData.power} onChange={handleChange}/>
                         </div>
 
                         <div className="auth-field">
-                            <label htmlFor="velicinaSlike">Rezolucija slike</label>
-                            <input id="velicinaSlike" name="velicinaSlike" type="text" placeholder="npr. 6000x4000" value={formData.velicinaSlike} onChange={handleChange}/>
+                            <label htmlFor="imageSize">Image resolution</label>
+                            <input id="imageSize" name="imageSize" type="text" placeholder="e.g. 6000x4000" value={formData.imageSize} onChange={handleChange}/>
                         </div>
                     </div>
 
                     <div className="auth-field">
-                        <label htmlFor="opis">Opis</label>
-                        <textarea id="opis" name="opis" rows="4" placeholder="Detaljan opis specifikacije" value={formData.opis} onChange={handleChange}/>
+                        <label htmlFor="description">Description</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Detailed description of the specification" value={formData.description} onChange={handleChange}/>
                     </div>
 
                     <div className="camera-form-toggles">
@@ -110,10 +110,10 @@ const AddSpecificationPage = ({loggedInUser}) => {
 
                     <div className="verification-actions">
                         <button type="button" className="btn-secondary" onClick={() => navigate("/")} disabled={isSubmitting}>
-                            Nazad
+                            Back
                         </button>
                         <button type="submit" className="auth-submit" disabled={isSubmitting} style={{width: "auto", padding: "0 20px"}}>
-                            {isSubmitting ? "Čuvanje..." : "Dodaj specifikaciju"}
+                            {isSubmitting ? "Saving..." : "Add specification"}
                         </button>
                     </div>
                 </form>

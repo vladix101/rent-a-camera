@@ -1,19 +1,19 @@
 import {useState} from "react"
 import {apiUrl} from "../../api/apiConfig.js"
 
-const formatDateSrb = (iso) => new Date(iso).toLocaleDateString("sr-Latn-RS")
+const formatDate = (iso) => new Date(iso).toLocaleDateString("en-GB")
 
-const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSuccess}) => {
+const PaymentModal = ({camera, dateFrom, dateTo, loggedInUser, onClose, onSuccess}) => {
     const [formData, setFormData] = useState({
-        brojKartice: "",
-        datumIstekaKartice: "",
+        cardNumber: "",
+        cardExpiry: "",
         cvc: ""
     })
     const [fieldErrors, setFieldErrors] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [success, setSuccess] = useState(false)
 
-    const klijentIme = `${loggedInUser?.ime ?? ""} ${loggedInUser?.prezime ?? ""}`.trim() || loggedInUser?.username
+    const clientName = `${loggedInUser?.firstName ?? ""} ${loggedInUser?.lastName ?? ""}`.trim() || loggedInUser?.username
 
     const handleChange = (event) => {
         const {name, value} = event.target
@@ -23,16 +23,16 @@ const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSu
 
     const validate = () => {
         const errors = {}
-        const brojKartice = formData.brojKartice.replace(/\s+/g, "")
+        const cardNumber = formData.cardNumber.replace(/\s+/g, "")
 
-        if (!/^\d{12,19}$/.test(brojKartice)) {
-            errors.brojKartice = "Unesite validan broj kartice"
+        if (!/^\d{12,19}$/.test(cardNumber)) {
+            errors.cardNumber = "Enter a valid card number"
         }
-        if (!formData.datumIstekaKartice.trim()) {
-            errors.datumIstekaKartice = "Datum isteka je obavezan"
+        if (!formData.cardExpiry.trim()) {
+            errors.cardExpiry = "Expiry date is required"
         }
         if (!/^\d{3,4}$/.test(formData.cvc.trim())) {
-            errors.cvc = "CVC mora imati 3 ili 4 cifre"
+            errors.cvc = "CVC must be 3 or 4 digits"
         }
 
         setFieldErrors(errors)
@@ -48,32 +48,32 @@ const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSu
         setIsSubmitting(true)
 
         try {
-            const response = await fetch(apiUrl("/api/iznajmljivanja"), {
+            const response = await fetch(apiUrl("/api/rentals"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${loggedInUser.token}`
                 },
                 body: JSON.stringify({
-                    fotoaparatId: fotoaparat.id,
-                    datumOd,
-                    datumDo,
+                    cameraId: camera.id,
+                    dateFrom,
+                    dateTo,
                     ...formData
                 })
             })
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null)
-                setFieldErrors(errorData?.fieldErrors ?? {form: "Plaćanje nije uspelo"})
+                setFieldErrors(errorData?.fieldErrors ?? {form: "Payment failed"})
                 return
             }
 
-            const iznajmljivanje = await response.json()
+            const rental = await response.json()
             setSuccess(true)
-            setTimeout(() => onSuccess(iznajmljivanje), 1400)
+            setTimeout(() => onSuccess(rental), 1400)
         } catch (error) {
-            console.error("Error creating iznajmljivanje:", error.message)
-            setFieldErrors({form: "Plaćanje nije uspelo. Pokušajte ponovo."})
+            console.error("Error creating rental:", error.message)
+            setFieldErrors({form: "Payment failed. Please try again."})
         } finally {
             setIsSubmitting(false)
         }
@@ -88,44 +88,44 @@ const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSu
                 aria-labelledby="payment-title"
                 onClick={(event) => event.stopPropagation()}
             >
-                <h2 id="payment-title">Plaćanje</h2>
+                <h2 id="payment-title">Payment</h2>
 
                 <p className="payment-summary">
-                    <strong>{fotoaparat.proizvodjac?.name}</strong>{fotoaparat.specifikacija?.rezolucija ? ` · ${fotoaparat.specifikacija.rezolucija}` : ""}<br/>
-                    {formatDateSrb(datumOd)} - {formatDateSrb(datumDo)}<br/>
-                    Klijent: <strong>{klijentIme}</strong>
+                    <strong>{camera.manufacturer?.name}</strong>{camera.specification?.resolution ? ` · ${camera.specification.resolution}` : ""}<br/>
+                    {formatDate(dateFrom)} - {formatDate(dateTo)}<br/>
+                    Client: <strong>{clientName}</strong>
                 </p>
 
                 {success ? (
-                    <p className="payment-success">Plaćanje uspešno! Iznajmljivanje je potvrđeno, a PDF potvrda je poslata na vaš email.</p>
+                    <p className="payment-success">Payment successful! Your rental is confirmed and a PDF confirmation has been sent to your email.</p>
                 ) : (
                     <form onSubmit={handleSubmit}>
                         <div className="auth-field">
-                            <label htmlFor="brojKartice">Broj kartice</label>
+                            <label htmlFor="cardNumber">Card number</label>
                             <input
-                                id="brojKartice"
-                                name="brojKartice"
+                                id="cardNumber"
+                                name="cardNumber"
                                 type="text"
                                 inputMode="numeric"
                                 placeholder="4111 1111 1111 1111"
-                                value={formData.brojKartice}
+                                value={formData.cardNumber}
                                 onChange={handleChange}
                             />
-                            {fieldErrors.brojKartice && <p className="field-error">{fieldErrors.brojKartice}</p>}
+                            {fieldErrors.cardNumber && <p className="field-error">{fieldErrors.cardNumber}</p>}
                         </div>
 
                         <div className="payment-row">
                             <div className="auth-field">
-                                <label htmlFor="datumIstekaKartice">Datum isteka</label>
+                                <label htmlFor="cardExpiry">Expiry date</label>
                                 <input
-                                    id="datumIstekaKartice"
-                                    name="datumIstekaKartice"
+                                    id="cardExpiry"
+                                    name="cardExpiry"
                                     type="text"
-                                    placeholder="MM/GG"
-                                    value={formData.datumIstekaKartice}
+                                    placeholder="MM/YY"
+                                    value={formData.cardExpiry}
                                     onChange={handleChange}
                                 />
-                                {fieldErrors.datumIstekaKartice && <p className="field-error">{fieldErrors.datumIstekaKartice}</p>}
+                                {fieldErrors.cardExpiry && <p className="field-error">{fieldErrors.cardExpiry}</p>}
                             </div>
 
                             <div className="auth-field">
@@ -144,15 +144,15 @@ const PaymentModal = ({fotoaparat, datumOd, datumDo, loggedInUser, onClose, onSu
                         </div>
 
                         {fieldErrors.form && <p className="form-error">{fieldErrors.form}</p>}
-                        {fieldErrors.fotoaparatId && <p className="form-error">{fieldErrors.fotoaparatId}</p>}
-                        {fieldErrors.datumOd && <p className="form-error">{fieldErrors.datumOd}</p>}
+                        {fieldErrors.cameraId && <p className="form-error">{fieldErrors.cameraId}</p>}
+                        {fieldErrors.dateFrom && <p className="form-error">{fieldErrors.dateFrom}</p>}
 
                         <div className="verification-actions">
                             <button type="button" className="btn-secondary" onClick={onClose} disabled={isSubmitting}>
-                                Otkaži
+                                Cancel
                             </button>
                             <button type="submit" className="auth-submit" disabled={isSubmitting} style={{width: "auto", padding: "0 20px"}}>
-                                {isSubmitting ? "Obrada..." : "Potvrdi plaćanje"}
+                                {isSubmitting ? "Processing..." : "Confirm payment"}
                             </button>
                         </div>
                     </form>

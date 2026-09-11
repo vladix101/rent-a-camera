@@ -1,7 +1,7 @@
 import dslr from "../assets/cameras/dslr.svg"
 import mirrorless from "../assets/cameras/mirrorless.svg"
-import kompaktni from "../assets/cameras/kompaktni.svg"
-import akciona from "../assets/cameras/akciona.svg"
+import compact from "../assets/cameras/compact.svg"
+import action from "../assets/cameras/action.svg"
 import instant from "../assets/cameras/instant.svg"
 import video from "../assets/cameras/video.svg"
 import defaultImage from "../assets/cameras/default.svg"
@@ -9,10 +9,10 @@ import defaultImage from "../assets/cameras/default.svg"
 const CATEGORY_IMAGES = {
     "DSLR": dslr,
     "Mirrorless": mirrorless,
-    "Kompaktni": kompaktni,
-    "Akciona kamera": akciona,
+    "Compact": compact,
+    "Action camera": action,
     "Instant": instant,
-    "Video kamera": video,
+    "Video camera": video,
 }
 
-export const getCameraImage = (kategorijaNaziv) => CATEGORY_IMAGES[kategorijaNaziv] || defaultImage
+export const getCameraImage = (categoryName) => CATEGORY_IMAGES[categoryName] || defaultImage

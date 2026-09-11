@@ -22,15 +22,15 @@ public class JwtUtil {
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
-    public String generateToken(Long userId, String username, String ime, String prezime, String userType) {
+    public String generateToken(Long userId, String username, String firstName, String lastName, String userType) {
         Date now = new Date();
         Date expiresAt = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(username)
                 .claim("userId", userId)
-                .claim("ime", ime)
-                .claim("prezime", prezime)
+                .claim("firstName", firstName)
+                .claim("lastName", lastName)
                 .claim("userType", userType)
                 .issuedAt(now)
                 .expiration(expiresAt)
@@ -46,7 +46,7 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException | IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nevažeći ili istekao token");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
         }
     }
 
@@ -54,7 +54,7 @@ public class JwtUtil {
         Claims claims = parseToken(extractToken(authHeader));
 
         if (!expectedUserType.equals(claims.get("userType", String.class))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akcija nije dozvoljena za ovaj tip korisnika");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action is not allowed for this user type");
         }
 
         return claims.get("userId", Long.class) != null
@@ -64,7 +64,7 @@ public class JwtUtil {
 
     private String extractToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nedostaje autorizacioni token");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization token is missing");
         }
         return authHeader.substring("Bearer ".length());
     }

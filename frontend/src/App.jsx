@@ -48,28 +48,28 @@ function App() {
           <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
           <Route path="/register" element={<Register/>}/>
           <Route
-              path="/moja-iznajmljivanja"
-              element={loggedInUser?.userType === "KLIJENT" ? <MyRentals loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/my-rentals"
+              element={loggedInUser?.userType === "CLIENT" ? <MyRentals loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
-              path="/dodaj-aparat"
-              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddCameraPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/add-camera"
+              element={loggedInUser?.userType === "EMPLOYEE" ? <AddCameraPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
-              path="/dodaj-kategoriju"
-              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddCategoryPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/add-category"
+              element={loggedInUser?.userType === "EMPLOYEE" ? <AddCategoryPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
-              path="/dodaj-specifikaciju"
-              element={loggedInUser?.userType === "ZAPOSLENI" ? <AddSpecificationPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/add-specification"
+              element={loggedInUser?.userType === "EMPLOYEE" ? <AddSpecificationPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
-              path="/klijenti"
-              element={loggedInUser?.userType === "ZAPOSLENI" ? <ClientsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/clients"
+              element={loggedInUser?.userType === "EMPLOYEE" ? <ClientsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
           <Route
-              path="/statistika"
-              element={loggedInUser?.userType === "ZAPOSLENI" ? <StatisticsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
+              path="/statistics"
+              element={loggedInUser?.userType === "EMPLOYEE" ? <StatisticsPage loggedInUser={loggedInUser}/> : <Navigate to="/" replace/>}
           />
         </Routes>
       </>
