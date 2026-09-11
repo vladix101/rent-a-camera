@@ -106,7 +106,7 @@ The host ports are deliberately offset from the defaults so this stack can run a
 MySQL on 3306 and alongside other projects. Database schema and demo data are created on first
 start.
 
-To send verification and confirmation emails, create a `.env` file next to `docker-compose.yml`
+To send verification and confirmation emails, create a `.env` file next to `compose.yml`
 (it is git-ignored):
 
 ```
