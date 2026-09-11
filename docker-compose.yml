@@ -1,0 +1,54 @@
+name: rent-a-camera
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: rent-a-camera-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: njtfoto
+    ports:
+      # 3308 on the host so it does not clash with a local MySQL on 3306
+      - "3308:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  backend:
+    build: ./backend
+    container_name: rent-a-camera-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/njtfoto?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      # Gmail credentials - put them in .env (not in git). The app runs without them,
+      # only the verification and confirmation emails are not delivered.
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-rentacamera-local-dev-secret-change-me-0123456789abcdef}
+    ports:
+      - "8081:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: rent-a-camera-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8081
+    ports:
+      - "5174:80"
+
+volumes:
+  mysql-data:

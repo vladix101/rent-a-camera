@@ -87,6 +87,36 @@ The app is served on `http://localhost:5173`. It auto-detects the backend at
 configuration. To point it elsewhere, copy `frontend/.env.example` to `frontend/.env` and set
 `VITE_API_BASE_URL`.
 
+## Run with Docker
+
+The whole stack — MySQL, the API and the frontend — runs from a single Compose file, so nothing
+needs to be installed apart from Docker.
+
+```bash
+docker compose up --build
+```
+
+| Service  | URL / port                                  |
+|----------|---------------------------------------------|
+| Frontend | http://localhost:5174                       |
+| Backend  | http://localhost:8081                       |
+| MySQL    | `localhost:3308` (root / root, db `njtfoto`)|
+
+The host ports are deliberately offset from the defaults so this stack can run alongside a local
+MySQL on 3306 and alongside other projects. Database schema and demo data are created on first
+start.
+
+To send verification and confirmation emails, create a `.env` file next to `docker-compose.yml`
+(it is git-ignored):
+
+```
+MAIL_USERNAME=your.address@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+JWT_SECRET=some-long-random-secret
+```
+
+Without it the app still runs; only the emails are not delivered.
+
 ## Demo accounts
 
 Seeded by Liquibase, for local testing only.
